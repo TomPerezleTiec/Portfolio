@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tennis Court 3D</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+  </head>
+  <body>
+    <div id="canvas-container">
+      <div id="bottom-portal"></div>
+    </div>
+    <div class="content">
+      <!-- Première page -->
+      <div id="first-page" class="page">
+        <div id="number-3d-container"></div>
+        <div id="titles">
+          <p id="info">Vous pouvez naviguer dans l'environnement 3D</p>
+          <div id="top-title"></div>
+          <div id="bottom-title"></div>
+        </div>
+        <button id="text-container" onclick="handleRedirect('1')">
+          <h1 id="title"></h1>
+          <p id="description"></p>
+        </button>
+        <div id="left-arrow" class="arrow"><</div>
+        <div id="right-arrow" class="arrow">></div>
+      </div>
+
+      <!-- Deuxième page -->
+      <div id="second-page" class="page">
+        <div id="number-3d-container-2"></div>
+        <div id="text-container-2">
+          <h1 id="title-2"></h1>
+          <p id="description-2"></p>
+        </div>
+        <div id="titles-2">
+          <p id="info">
+            Vous pouvez jouer en mettant la souris dans l'environnement 3D
+          </p>
+          <div id="top-title-2"></div>
+          <div id="bottom-title-2"></div>
+        </div>
+        <div id="left-arrow-2" class="arrow"><</div>
+        <div id="right-arrow-2" class="arrow">></div>
+      </div>
+
+      <!-- Troisième page -->
+      <div id="third-page" class="page">
+        <div id="number-3d-container-3"></div>
+        <div id="text-container-3">
+          <h1 id="title-3"></h1>
+          <p id="description-3"></p>
+        </div>
+        <div id="titles-3">
+          <p id="info">Appuyez sur espace</p>
+          <div id="top-title-3"></div>
+          <div id="bottom-title-3"></div>
+        </div>
+        <div id="left-arrow-3" class="arrow"><</div>
+        <div id="right-arrow-3" class="arrow">></div>
+      </div>
+    </div>
+    <script src="module.js"></script>
+  </body>
+</html>

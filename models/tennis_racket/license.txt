@@ -1,0 +1,8 @@
+Model Information:
+* title:	Wilson Blade Team Tennis Racket
+* source:	https://sketchfab.com/3d-models/wilson-blade-team-tennis-racket-c9db9da0832341cf843b3b5abe615c38
+* author:	Ya (https://sketchfab.com/Yarik16)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
