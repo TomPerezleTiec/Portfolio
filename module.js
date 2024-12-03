@@ -536,13 +536,13 @@ function updateBallPhysics() {
   }
 }
 
+// Définition globale du loader
 const loader = new THREE.GLTFLoader();
 
 let padelRacketModel, padelCourtModel;
 let padelModelsLoaded = false;
 
 function loadPadelModels(callback) {
-  const loader = new THREE.GLTFLoader();
   const promises = [
     new Promise((resolve) => {
       loader.load("models/padel_racket/scene.gltf", function (gltf) {
@@ -589,95 +589,48 @@ loader.load("models/tennis_court/scene.gltf", function (gltf) {
     });
   }
 
-  loader.load("models/tennis_ball/scene.gltf", function (gltf) {
-    tennisBallModel = gltf.scene;
-    tennisBallModel.scale.set(3, 3, 3);
-
-    centerPivot(tennisBallModel);
-
-    tennisBallModel.visible = false;
-    resetBall();
-    scene.add(tennisBallModel);
-
-    const width = window.innerWidth * 0.5;
-    const height = window.innerHeight;
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
-    renderer.render(scene, camera);
+  // Charger d'autres ressources (balles, raquettes, etc.) après le terrain
+  Promise.all([loadTennisBallModel(), loadTennisRacketModel()]).then(() => {
+    // Initialiser le rendu et la caméra une fois que tout est chargé
+    initializeCameraAndScene();
   });
+});
 
-  loader.load("models/tennis_racket/scene.gltf", function (gltf) {
-    tennisRacketModel = gltf.scene;
-    tennisRacketModel.scale.set(1.5, 1.5, 1.5);
-    tennisRacketModel.visible = false;
-    tennisRacketModel.position.z = 0;
-    scene.add(tennisRacketModel);
-    initializeRacket();
+function loadTennisBallModel() {
+  return new Promise((resolve) => {
+    loader.load("models/tennis_ball/scene.gltf", function (gltf) {
+      tennisBallModel = gltf.scene;
+      tennisBallModel.scale.set(3, 3, 3);
+      centerPivot(tennisBallModel);
+      tennisBallModel.visible = false;
+      resetBall();
+      scene.add(tennisBallModel);
+      resolve();
+    });
   });
+}
 
-  const container = document.getElementById("canvas-container");
-
-  const originalBallScale = { x: 3, y: 3, z: 3 };
-  const bottomPortal = document.getElementById("bottom-portal");
-
-  container.addEventListener("mouseenter", function () {
-    container.style.cursor = "none";
-
-    if (tennisBallModel.visible && !terrainModel.visible) {
-      gsap.to(tennisBallModel.scale, {
-        x: originalBallScale.x * 0.25,
-        y: originalBallScale.y * 0.25,
-        z: originalBallScale.z * 0.25,
-        duration: 0.5,
-        ease: "power2.inOut",
-      });
-      tennisRacketModel.visible = true;
-      bottomPortal.classList.add("active");
-    }
+function loadTennisRacketModel() {
+  return new Promise((resolve) => {
+    loader.load("models/tennis_racket/scene.gltf", function (gltf) {
+      tennisRacketModel = gltf.scene;
+      tennisRacketModel.scale.set(1.5, 1.5, 1.5);
+      tennisRacketModel.visible = false;
+      tennisRacketModel.position.z = 0;
+      scene.add(tennisRacketModel);
+      initializeRacket();
+      resolve();
+    });
   });
+}
 
-  container.addEventListener("mouseleave", function () {
-    container.style.cursor = "default";
-
-    if (tennisBallModel.visible) {
-      gsap.to(tennisBallModel.scale, {
-        x: originalBallScale.x,
-        y: originalBallScale.y,
-        z: originalBallScale.z,
-        duration: 0.5,
-        ease: "power2.inOut",
-      });
-      tennisBallModel.position.set(0, 35, 50);
-      racketHit = false;
-      lastHitTime = 0;
-      initialSpeed = 1;
-      resetScore();
-      bottomPortal.classList.remove("active");
-    }
-    tennisRacketModel.visible = false;
-  });
-
-  container.addEventListener("mousemove", function (event) {
-    if (tennisRacketModel) {
-      const rect = container.getBoundingClientRect();
-
-      const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      const mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-      tennisRacketModel.position.x = mouseX * 150;
-      tennisRacketModel.position.y = mouseY * 80;
-      tennisRacketModel.position.z = 50;
-    }
-  });
-
-  scoreContainer.style.display = "none";
-
-  window.addEventListener("click", onMouseClick, false);
-
-  function onMouseClick(event) {
-    spinVelocity += 0.2;
-  }
+function initializeCameraAndScene() {
+  const width = window.innerWidth * 0.5;
+  const height = window.innerHeight;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+  renderer.render(scene, camera);
 
   setCameraForCourt();
 
@@ -691,7 +644,7 @@ loader.load("models/tennis_court/scene.gltf", function (gltf) {
 
   controls.target.set(0, 0, 0);
   controls.update();
-});
+}
 
 function transitionToPadel() {
   terrainModel.visible = false;
