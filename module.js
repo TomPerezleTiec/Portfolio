@@ -321,7 +321,57 @@ function showRacket() {
   tennisRacketModel.visible = true;
 }
 
-const originalBallScale = { x: 0.75, y: 0.75, z: 0.75 };
+const originalBallScale = { x: 3, y: 3, z: 3 };
+const bottomPortal = document.getElementById("bottom-portal");
+
+container.addEventListener("mouseenter", function () {
+  container.style.cursor = "none";
+  if (tennisBallModel.visible && !terrainModel.visible) {
+    gsap.to(tennisBallModel.scale, {
+      x: originalBallScale.x * 0.25,
+      y: originalBallScale.y * 0.25,
+      z: originalBallScale.z * 0.25,
+      duration: 0.5,
+      ease: "power2.inOut",
+    });
+    tennisRacketModel.visible = true;
+    bottomPortal.classList.add("active");
+  }
+});
+
+container.addEventListener("mouseleave", function () {
+  container.style.cursor = "default";
+  if (tennisBallModel.visible) {
+    gsap.to(tennisBallModel.scale, {
+      x: originalBallScale.x,
+      y: originalBallScale.y,
+      z: originalBallScale.z,
+      duration: 0.5,
+      ease: "power2.inOut",
+    });
+    tennisBallModel.position.set(0, 35, 50);
+    racketHit = false;
+    lastHitTime = 0;
+    initialSpeed = 1;
+    resetScore();
+    bottomPortal.classList.remove("active");
+  }
+  tennisRacketModel.visible = false;
+});
+
+container.addEventListener("mousemove", function (event) {
+  const rect = container.getBoundingClientRect();
+  const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  const mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  tennisRacketModel.position.x = mouseX * 150 - 32;
+  tennisRacketModel.position.y = mouseY * 80 + 27;
+  tennisRacketModel.position.z = 50;
+});
+
+window.addEventListener("click", onMouseClick, false);
+function onMouseClick(event) {
+  spinVelocity += 0.2;
+}
 
 function explodeAndRecomposeBall() {
   gsap.to(tennisBallModel.scale, {
@@ -536,7 +586,6 @@ function updateBallPhysics() {
   }
 }
 
-// Définition globale du loader
 const loader = new THREE.GLTFLoader();
 
 let padelRacketModel, padelCourtModel;
@@ -589,9 +638,7 @@ loader.load("models/tennis_court/scene.gltf", function (gltf) {
     });
   }
 
-  // Charger d'autres ressources (balles, raquettes, etc.) après le terrain
   Promise.all([loadTennisBallModel(), loadTennisRacketModel()]).then(() => {
-    // Initialiser le rendu et la caméra une fois que tout est chargé
     initializeCameraAndScene();
   });
 });
@@ -798,7 +845,7 @@ function transitionToSecondPage() {
         y: 0,
         ease: "power2.inOut",
         onComplete: function () {
-          tennisBallModel.position.set(-2000, 2000, 0);
+          tennisBallModel.position.set(-2000, 1500, 0);
           tennisBallModel.visible = true;
 
           let rotationY = 0;
