@@ -638,7 +638,9 @@ loader.load("models/tennis_court/scene.gltf", function (gltf) {
     });
   }
 
+  // Charger d'autres ressources (balles, raquettes, etc.) après le terrain
   Promise.all([loadTennisBallModel(), loadTennisRacketModel()]).then(() => {
+    // Initialiser le rendu et la caméra une fois que tout est chargé
     initializeCameraAndScene();
   });
 });
@@ -845,7 +847,7 @@ function transitionToSecondPage() {
         y: 0,
         ease: "power2.inOut",
         onComplete: function () {
-          tennisBallModel.position.set(-2000, 1500, 0);
+          tennisBallModel.position.set(-2000, 2000, 0);
           tennisBallModel.visible = true;
 
           let rotationY = 0;
