@@ -623,6 +623,9 @@ function loadPadelModels(callback) {
   });
 }
 
+const loadingContainer = document.getElementById("loading-container");
+loadingContainer.style.display = "block";
+
 loader.load("models/tennis_court/scene.gltf", function (gltf) {
   terrainModel = gltf.scene;
   terrainModel.scale.set(0.1, 0.15, 0.15);
@@ -638,10 +641,15 @@ loader.load("models/tennis_court/scene.gltf", function (gltf) {
     });
   }
 
-  // Charger d'autres ressources (balles, raquettes, etc.) après le terrain
   Promise.all([loadTennisBallModel(), loadTennisRacketModel()]).then(() => {
-    // Initialiser le rendu et la caméra une fois que tout est chargé
     initializeCameraAndScene();
+
+    loadingContainer.style.opacity = "0";
+    loadingContainer.style.transform = "translate(-50%, -50%) scale(0.9)";
+
+    setTimeout(() => {
+      loadingContainer.style.display = "none";
+    }, 500);
   });
 });
 
