@@ -133,7 +133,6 @@ function createModels({
         const boundingBox = new THREE.Box3().setFromObject(textMesh);
         const center = boundingBox.getCenter(new THREE.Vector3());
         textMesh.geometry.translate(-center.x, -center.y, -center.z);
-
         const angle = angles[index];
         const x = radius * Math.cos(angle);
         const z = radius * Math.sin(angle);
@@ -141,7 +140,9 @@ function createModels({
 
         const depthFactor = (z + radius) / (2 * radius);
         const scaleFactor = 0.5 + 0.5 * depthFactor;
-        const color = depthFactor < 0.5 ? 0x888888 : 0xffffff;
+        // Seul le chiffre à l'avant est en blanc, tous les autres en gris
+        const isFrontModel = z >= radius - 5;
+        const color = isFrontModel ? 0xffffff : 0x888888;
 
         textMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
         textMesh.material.color.set(color);
@@ -165,12 +166,12 @@ function createModels({
       animate();
     }
   );
-
   function updateTextVisibility() {
     models.forEach((model) => {
       const depthFactor = (model.position.z + radius) / (2 * radius);
       const scaleFactor = 0.5 + 0.5 * depthFactor;
-      const color = depthFactor < 0.5 ? 0x888888 : 0xffffff;
+      // On change la couleur seulement pour les modèles qui sont proches du front
+      const color = model.position.z >= radius - 5 ? 0xffffff : 0x888888;
 
       model.scale.set(scaleFactor, scaleFactor, scaleFactor);
       model.material.color.set(color);
@@ -224,18 +225,14 @@ function createModels({
         const x = radius * Math.cos(angle);
         const z = radius * Math.sin(angle);
         model.position.set(x, 0, z);
-
         const depthFactor = (z + radius) / (2 * radius);
         const scaleFactor = 0.5 + 0.5 * depthFactor;
-        const color = depthFactor < 0.5 ? 0x888888 : 0xffffff;
+
+        // On utilise une approche simple pour les couleurs: blanc devant, gris ailleurs
+        const color = z >= radius - 5 ? 0xffffff : 0x888888;
 
         model.scale.set(scaleFactor, scaleFactor, scaleFactor);
         model.material.color.set(color);
-
-        if (Math.abs(z - (radius - 5)) > 0.1) {
-          model.material.color.set(0x888888);
-          model.scale.set(0.5, 0.5, 0.5);
-        }
       });
 
       if (progress < 1) {
@@ -433,10 +430,27 @@ let spinVelocity = 0;
 const spinDecay = 0.98;
 
 function applyForceToBall(force) {
-  const newSpeed = Math.min(ballVelocity.length() * speedIncrement, maxSpeed);
-  ballVelocity.setLength(newSpeed);
-  ballVelocity.add(force);
-  spinVelocity += 0.2;
+  // Calculer une vitesse qui tient compte de la vitesse actuelle
+  let currentSpeed = ballVelocity.length();
+
+  // Limiter la vitesse maximale pour éviter des comportements erratiques
+  const newSpeed = Math.min(currentSpeed * speedIncrement, maxSpeed);
+
+  // Si la vitesse actuelle est très faible, utiliser la force comme nouvelle direction
+  if (currentSpeed < 0.1) {
+    ballVelocity.copy(force);
+  } else {
+    // Autrement, combiner les deux vecteurs pour un comportement plus réaliste
+    // Cette méthode conserve une partie de la dynamique précédente
+    ballVelocity.multiplyScalar(0.2); // Réduire l'influence de la direction précédente
+    ballVelocity.add(force.multiplyScalar(0.8)); // Donner plus de poids à la nouvelle direction
+
+    // S'assurer que la vitesse résultante a la bonne magnitude
+    ballVelocity.normalize().multiplyScalar(newSpeed);
+  }
+
+  // Ajouter un effet de rotation basé sur la direction latérale
+  spinVelocity = Math.max(-0.3, Math.min(0.3, force.x * 0.15));
 }
 
 let scoreContainer = document.getElementById("score-container");
@@ -548,12 +562,28 @@ function checkCollision() {
     lastHitTime = currentTime;
     updateScore();
 
-    const lateralVariation = (Math.random() - 0.5) * 2;
-    const upwardForce = new THREE.Vector3(lateralVariation, 1, 0)
-      .normalize()
-      .multiplyScalar(initialSpeed);
+    // Calculer un vecteur de direction basé sur la position relative de la balle et de la raquette
+    // Cela permet des rebonds plus réalistes basés sur l'angle de frappe
+    const directionVector = new THREE.Vector3()
+      .subVectors(tennisBallModel.position, tennisRacketModel.position)
+      .normalize();
 
-    applyForceToBall(upwardForce);
+    // Ajouter une composante upward (vers le haut) pour s'assurer que la balle va toujours vers le haut
+    directionVector.y = Math.max(0.5, directionVector.y);
+
+    // Ajouter une variation latérale mais plus subtile
+    const lateralVariation = (Math.random() - 0.5) * 1.2;
+    directionVector.x += lateralVariation;
+
+    // Normaliser à nouveau et appliquer la force
+    directionVector.normalize().multiplyScalar(initialSpeed);
+
+    // Calcul de l'effet de spin (rotation) en fonction de la position de l'impact
+    const spinEffect =
+      (tennisBallModel.position.x - tennisRacketModel.position.x) * 0.05;
+    spinVelocity = Math.max(-0.3, Math.min(0.3, spinEffect));
+
+    applyForceToBall(directionVector);
     initialSpeed *= speedIncrement;
   }
 }
@@ -577,27 +607,50 @@ window.addEventListener("resize", updateSceneBounds);
 
 function updateBallPhysics() {
   if (ballVelocity.length() > 0.01) {
+    // Appliquer l'effet de gravité pour une trajectoire plus naturelle
+    ballVelocity.y -= 0.08; // Gravité légère
+
+    // Appliquer un amortissement global (résistance à l'air)
+    ballVelocity.multiplyScalar(0.995);
+
+    // Mettre à jour la position de la balle
     tennisBallModel.position.add(ballVelocity);
 
     const halfBallSize = tennisBallModel.scale.x * 1.5;
     const maxX = sceneWidth / 2 - halfBallSize;
     const maxY = sceneHeight / 2 - halfBallSize;
 
+    // Rebond sur les murs latéraux
     if (tennisBallModel.position.x < containerCenterX - maxX) {
-      ballVelocity.x = Math.abs(ballVelocity.x);
+      // Calcul d'un rebond plus naturel
+      ballVelocity.x = Math.abs(ballVelocity.x) * 0.9; // Amortissement de 10%
       tennisBallModel.position.x = containerCenterX - maxX;
+      // Ajouter un léger effet aléatoire à la rotation
+      spinVelocity += Math.random() * 0.1 - 0.05;
     } else if (tennisBallModel.position.x > containerCenterX + maxX) {
-      ballVelocity.x = -Math.abs(ballVelocity.x);
+      ballVelocity.x = -Math.abs(ballVelocity.x) * 0.9; // Amortissement de 10%
       tennisBallModel.position.x = containerCenterX + maxX;
+      // Ajouter un léger effet aléatoire à la rotation
+      spinVelocity += Math.random() * 0.1 - 0.05;
     }
 
+    // Rebond sur le plafond
     if (tennisBallModel.position.y > containerCenterY + maxY) {
-      ballVelocity.y = -Math.abs(ballVelocity.y);
+      // Rebond avec amortissement
+      ballVelocity.y = -Math.abs(ballVelocity.y) * 0.85; // Amortissement de 15%
       tennisBallModel.position.y = containerCenterY + maxY;
-    } else if (tennisBallModel.position.y < containerCenterY - maxY) {
+      // Ajouter un léger effet de rotation
+      spinVelocity += ballVelocity.x * 0.03;
+    }
+    // Si la balle tombe en bas
+    else if (tennisBallModel.position.y < containerCenterY - maxY) {
       resetScore();
-
       explodeAndRecomposeBall();
+    }
+
+    // Appliquer une rotation plus naturelle basée sur la direction du mouvement
+    if (Math.abs(ballVelocity.x) > 0.1) {
+      tennisBallModel.rotation.z -= ballVelocity.x * 0.03;
     }
   } else {
     ballVelocity.set(0, 0, 0);
