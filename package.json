@@ -1,5 +1,14 @@
 {
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "Portfolio personnel avec visualisation 3D",
+  "main": "js/main.js",
+  "scripts": {
+    "start": "serve ."
+  },
   "dependencies": {
-    "cannon": "^0.6.2"
-  }
+    "cannon": "^0.6.2",
+    "serve": "^14.2.0"
+  },
+  "type": "module"
 }

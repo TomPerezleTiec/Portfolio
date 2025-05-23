@@ -1,3 +1,13 @@
+console.log("Module.js chargé");
+
+// Vérification des dépendances
+console.log("THREE disponible:", typeof THREE !== "undefined");
+console.log("GLTFLoader disponible:", typeof THREE.GLTFLoader !== "undefined");
+console.log(
+  "OrbitControls disponible:",
+  typeof THREE.OrbitControls !== "undefined"
+);
+
 const scene = new THREE.Scene();
 const aspectRatio = (window.innerWidth * 0.5) / window.innerHeight;
 const camera = new THREE.PerspectiveCamera(
@@ -587,9 +597,19 @@ function updateBallPhysics() {
 }
 
 const loader = new THREE.GLTFLoader();
+// Ajouter une fonction pour gérer les erreurs de chargement
+loader.manager = new THREE.LoadingManager();
+loader.manager.onError = function (url) {
+  console.error("Erreur lors du chargement de:", url);
+};
 
 let padelRacketModel, padelCourtModel;
 let padelModelsLoaded = false;
+
+console.log(
+  "Début du chargement des modèles - Vérifier les chemins des modèles"
+);
+console.log("Chemin actuel:", window.location.href);
 
 function loadPadelModels(callback) {
   const promises = [
