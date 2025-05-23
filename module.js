@@ -393,16 +393,25 @@ function explodeAndRecomposeBall() {
     onComplete: function () {
       tennisBallModel.visible = false;
       resetScore();
-
       gsap.delayedCall(0.2, function () {
         tennisBallModel.position.set(0, 35, 50);
         tennisBallModel.scale.set(0.01, 0.01, 0.01);
-        tennisBallModel.visible = true;
+        tennisBallModel.visible = true; // Vérifier si la souris est dans le conteneur pour appliquer la bonne taille
+        const rect = container.getBoundingClientRect();
+        // Utiliser une méthode plus fiable pour vérifier si la souris est dans le conteneur
+        const mouseX = window.event ? window.event.clientX : 0;
+        const mouseY = window.event ? window.event.clientY : 0;
+        const mouseIsInside =
+          mouseX >= rect.left &&
+          mouseX <= rect.right &&
+          mouseY >= rect.top &&
+          mouseY <= rect.bottom;
 
+        // Animer vers la taille appropriée selon la position de la souris
         gsap.to(tennisBallModel.scale, {
-          x: originalBallScale.x,
-          y: originalBallScale.y,
-          z: originalBallScale.z,
+          x: mouseIsInside ? originalBallScale.x * 0.25 : originalBallScale.x,
+          y: mouseIsInside ? originalBallScale.y * 0.25 : originalBallScale.y,
+          z: mouseIsInside ? originalBallScale.z * 0.25 : originalBallScale.z,
           duration: 0.4,
           ease: "power2.inOut",
         });
