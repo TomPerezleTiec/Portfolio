@@ -1229,10 +1229,44 @@ function updatePhysics() {
   });
 }
 
+// Créer un élément pour afficher la notification de limite
+let limitNotification = document.createElement("div");
+limitNotification.id = "limit-notification";
+limitNotification.style.position = "fixed";
+limitNotification.style.top = "20%";
+limitNotification.style.left = "50%";
+limitNotification.style.transform = "translate(-50%, -50%)";
+limitNotification.style.padding = "10px 20px";
+limitNotification.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+limitNotification.style.color = "white";
+limitNotification.style.borderRadius = "5px";
+limitNotification.style.fontWeight = "bold";
+limitNotification.style.zIndex = "1000";
+limitNotification.style.display = "none";
+limitNotification.style.textAlign = "center";
+limitNotification.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+limitNotification.style.border = "2px solid white";
+limitNotification.textContent = "Limite de 5 balles atteinte !";
+document.body.appendChild(limitNotification);
+
 window.addEventListener("keydown", function (event) {
   if (event.code === "Space" && currentPage === 3) {
-    setupDroppingBall();
-    console.log("Appui sur Espace - Nouvelle balle en chute.");
+    // Limiter à 5 raquettes maximum
+    if (balls.length < 5) {
+      setupDroppingBall();
+      console.log(
+        "Appui sur Espace - Nouvelle balle en chute. Total:",
+        balls.length
+      );
+    } else {
+      console.log("Limite de 5 raquettes atteinte !");
+      // Afficher la notification
+      limitNotification.style.display = "block";
+      // Faire disparaître la notification après 2 secondes
+      setTimeout(() => {
+        limitNotification.style.display = "none";
+      }, 2000);
+    }
   }
 });
 

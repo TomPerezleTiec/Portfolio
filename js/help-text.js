@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const firstPage = document.getElementById("first-page");
   const secondPage = document.getElementById("second-page");
   const thirdPage = document.getElementById("third-page");
-
   // Textes d'aide pour chaque page
   const helpTexts = {
     "first-page": "Vous pouvez naviguer dans l'environnement 3D",
