@@ -12,6 +12,102 @@ body {
   height: 100vh;
 }
 
+#help-text {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 15px;
+  border-radius: 8px;
+  z-index: 100;
+  pointer-events: none;
+  max-width: 250px; /* Limite la largeur pour forcer le retour à la ligne */
+}
+
+#canvas-info {
+  color: white;
+  margin: 0;
+  font-size: 1rem;
+  font-family: "Arial", sans-serif;
+  text-align: left; /* Alignement à gauche pour une meilleure lisibilité du texte multi-lignes */
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: normal; /* Permet le retour à la ligne */
+  word-wrap: break-word; /* Pour les mots très longs */
+  line-height: 1.4; /* Améliore l'espacement des lignes */
+}
+
+#screen-divider {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 0px; /* Changed from 1px to eliminate visible line */
+  height: 100vh;
+  background: transparent;
+  box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.4),
+    0 0 60px 30px rgba(120, 220, 255, 0.3);
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: dividerGlow 5s infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes dividerGlow {
+  0% {
+    box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.3),
+      0 0 60px 30px rgba(120, 220, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 35px 20px rgba(255, 255, 255, 0.5),
+      0 0 80px 40px rgba(120, 220, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.3),
+      0 0 60px 30px rgba(120, 220, 255, 0.2);
+  }
+}
+
+.divider-particle {
+  position: absolute;
+  background-color: rgba(204, 236, 31, 0.95); /* Tennis ball green-yellow */
+  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  box-shadow: 0 0 5px 2px rgba(180, 210, 20, 0.5);
+  animation: particleFloat 10s infinite;
+  opacity: 0;
+  /* Position will be set by JS */
+  pointer-events: none;
+  /* Tennis ball fuzz texture */
+  background-image: radial-gradient(
+    ellipse at center,
+    rgba(204, 236, 31, 0.95) 40%,
+    rgba(194, 226, 21, 0.9) 60%,
+    rgba(184, 216, 11, 0.85) 80%
+  );
+}
+
+@keyframes particleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  10% {
+    opacity: 0.95;
+  }
+  97% {
+    transform: translateY(-97vh) rotate(680deg);
+  }
+  99% {
+    opacity: 0.95;
+    transform: translateY(-99.5vh) rotate(710deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100vh) rotate(720deg);
+  }
+}
+
 .content {
   color: white;
 }
@@ -128,18 +224,21 @@ body {
   transform: translate(-50%, 0%);
   text-align: center;
   background-color: #282c34;
-  border: 2px solid white;
+  border: 5px solid #ffffff; /* Bordure plus épaisse et vraiment blanche */
+  outline: 2px solid #ffffff; /* Outline supplémentaire pour plus d'impact */
+  outline-offset: 3px; /* Espace entre la bordure et l'outline */
   border-radius: 10px;
   padding: 15px 20px 0px 20px;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 20px 10px rgba(255, 255, 255, 0.9); /* Lueur blanche intense */
   width: 40%;
 }
 
 #text-container:hover {
   transform: translate(-50%, -10%) scale(1.05);
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 8px 25px rgba(255, 255, 255, 0.9),
+    0px 0px 50px rgba(255, 255, 255, 0.7); /* Lueur plus intense au survol sans changer la bordure */
 }
 
 #title {
@@ -160,9 +259,15 @@ body {
   left: 50%;
   width: 50%;
   text-align: center;
-  top: 1%;
+  top: 5%; /* Descendu de 1% à 10% */
   pointer-events: none;
   font-family: "Arial", sans-serif;
+}
+
+#titles p#info,
+#titles-2 p#info,
+#titles-3 p#info {
+  display: none; /* Masquer les infos originales car elles sont maintenant dans #canvas-info */
 }
 
 #top-title {
@@ -227,18 +332,21 @@ body {
   transform: translate(-50%, 0%);
   text-align: center;
   background-color: #282c34;
-  border: 2px solid white;
+  border: 5px solid #ffffff; /* Bordure plus épaisse et vraiment blanche */
+  outline: 2px solid #ffffff; /* Outline supplémentaire pour plus d'impact */
+  outline-offset: 3px; /* Espace entre la bordure et l'outline */
   border-radius: 10px;
   padding: 15px 20px 0px 20px;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 20px 10px rgba(255, 255, 255, 0.9); /* Lueur blanche intense */
   width: 40%;
 }
 
 #text-container-2:hover {
   transform: translate(-50%, -10%) scale(1.05);
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 8px 25px rgba(255, 255, 255, 0.9),
+    0px 0px 50px rgba(255, 255, 255, 0.7); /* Lueur plus intense au survol sans changer la bordure */
 }
 
 #title-2 {
@@ -261,7 +369,7 @@ body {
   position: absolute;
   width: 50%;
   text-align: center;
-  top: 1%;
+  top: 10%; /* Descendu de 1% à 10% */
   pointer-events: none;
   font-family: "Arial", sans-serif;
 }
@@ -327,18 +435,21 @@ body {
   transform: translate(-50%, 0%);
   text-align: center;
   background-color: #282c34;
-  border: 2px solid white;
+  border: 5px solid #ffffff; /* Bordure plus épaisse et vraiment blanche */
+  outline: 2px solid #ffffff; /* Outline supplémentaire pour plus d'impact */
+  outline-offset: 3px; /* Espace entre la bordure et l'outline */
   border-radius: 10px;
   padding: 15px 20px 0px 20px;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 20px 10px rgba(255, 255, 255, 0.9); /* Lueur blanche intense */
   width: 40%;
 }
 
 #text-container-3:hover {
   transform: translate(-50%, -10%) scale(1.05);
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 8px 25px rgba(255, 255, 255, 0.9),
+    0px 0px 50px rgba(255, 255, 255, 0.7); /* Lueur plus intense au survol sans changer la bordure */
 }
 
 #title-3 {
@@ -361,7 +472,7 @@ body {
   position: absolute;
   width: 50%;
   text-align: center;
-  top: 1%;
+  top: 10%; /* Descendu de 1% à 10% */
   pointer-events: none;
   font-family: "Arial", sans-serif;
 }
