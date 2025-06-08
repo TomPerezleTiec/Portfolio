@@ -1,6 +1,9 @@
+// ------------------------------------------
+// INITIALIZATION AND DEPENDENCIES CHECK
+// ------------------------------------------
+
 console.log("Module.js chargé");
 
-// Vérification des dépendances
 console.log("THREE disponible:", typeof THREE !== "undefined");
 console.log("GLTFLoader disponible:", typeof THREE.GLTFLoader !== "undefined");
 console.log(
@@ -8,9 +11,12 @@ console.log(
   typeof THREE.OrbitControls !== "undefined"
 );
 
-// Initialisation de la variable currentPage dès le début
 let currentPage = 1;
 console.log("currentPage initialisé à:", currentPage);
+
+// ------------------------------------------
+// THREE.JS SCENE SETUP
+// ------------------------------------------
 
 const scene = new THREE.Scene();
 const aspectRatio = (window.innerWidth * 0.5) / window.innerHeight;
@@ -24,7 +30,6 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.update();
 
-// Position standard de la balle pour assurer la cohérence
 const BALL_POSITION = { x: 0, y: 25, z: 50 };
 
 setTimeout(function () {
@@ -38,22 +43,27 @@ setTimeout(function () {
   renderer.render(scene, camera);
 }, 50);
 
+// ------------------------------------------
+// UTILITY FUNCTIONS
+// ------------------------------------------
+
 function centerPivot(object) {
   const box = new THREE.Box3().setFromObject(object);
   const center = new THREE.Vector3();
   box.getCenter(center);
 
-  // Créer un groupe parent pour conserver la position visuelle
   const group = new THREE.Group();
-  // Ajouter l'objet au groupe en tenant compte du décalage
   object.position.sub(center);
   group.add(object);
 
-  // Préserver la position visuelle d'origine
   group.position.copy(center);
 
   return group;
 }
+
+// ------------------------------------------
+// RENDERER AND LIGHTING SETUP
+// ------------------------------------------
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -78,11 +88,19 @@ const pointLight = new THREE.PointLight(0xffffff, 0.3);
 pointLight.position.set(100, 200, 0);
 scene.add(pointLight);
 
+// ------------------------------------------
+// GLOBAL VARIABLES
+// ------------------------------------------
+
 let mixer,
   terrainModel,
   tennisBallModel,
   tennisRacketModel = false,
   tennisCourtVisible = true;
+
+// ------------------------------------------
+// PROJECT CAROUSEL SYSTEM
+// ------------------------------------------
 
 function createModels({
   containerId,
@@ -154,10 +172,8 @@ function createModels({
         const x = radius * Math.cos(angle);
         const z = radius * Math.sin(angle);
         textMesh.position.set(x, 0, z);
-
         const depthFactor = (z + radius) / (2 * radius);
         const scaleFactor = 0.5 + 0.5 * depthFactor;
-        // Seul le chiffre à l'avant est en blanc, tous les autres en gris
         const isFrontModel = z >= radius - 5;
         const color = isFrontModel ? 0xffffff : 0x888888;
 
@@ -187,7 +203,6 @@ function createModels({
     models.forEach((model) => {
       const depthFactor = (model.position.z + radius) / (2 * radius);
       const scaleFactor = 0.5 + 0.5 * depthFactor;
-      // On change la couleur seulement pour les modèles qui sont proches du front
       const color = model.position.z >= radius - 5 ? 0xffffff : 0x888888;
 
       model.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -204,10 +219,8 @@ function createModels({
       topTitleElement.innerText = projectData.topTitle;
       bottomTitleElement.innerText = projectData.bottomTitle;
 
-      // Stocker le numéro de projet actif dans un attribut data- pour le language-switcher
       container.dataset.activeProject = activeNumber;
 
-      // Déclencher un événement personnalisé pour signaler le changement de projet
       const event = new CustomEvent("projectChanged", {
         detail: {
           containerId: containerId,
@@ -257,7 +270,6 @@ function createModels({
         const depthFactor = (z + radius) / (2 * radius);
         const scaleFactor = 0.5 + 0.5 * depthFactor;
 
-        // On utilise une approche simple pour les couleurs: blanc devant, gris ailleurs
         const color = z >= radius - 5 ? 0xffffff : 0x888888;
 
         model.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -326,17 +338,25 @@ createModels({
   numberOfItems: 3,
 });
 
+// ------------------------------------------
+// CAMERA CONFIGURATION FUNCTIONS
+// ------------------------------------------
+
 function setCameraForCourt() {
   camera.position.set(0, 305, 1500);
   camera.lookAt(0, 0, 0);
 }
 
 function setCameraForBall() {
-  camera.position.set(0, 45, 150); // Ajusté pour être cohérent avec la position de la balle
-  camera.lookAt(0, 25, 0); // Regarde vers la hauteur où se trouve la balle
+  camera.position.set(0, 45, 150);
+  camera.lookAt(0, 25, 0);
 }
 
 setCameraForBall();
+
+// ------------------------------------------
+// GAME OBJECTS INITIALIZATION FUNCTIONS
+// ------------------------------------------
 
 function initializeRacket() {
   if (tennisRacketModel) {
@@ -350,7 +370,6 @@ function resetTerrain() {
 }
 
 function resetBall() {
-  // Utiliser une position hors écran cohérente avec BALL_POSITION.x et z
   tennisBallModel.position.set(BALL_POSITION.x, 1000, BALL_POSITION.z);
 }
 
@@ -358,7 +377,11 @@ function showRacket() {
   tennisRacketModel.visible = true;
 }
 
-const originalBallScale = { x: 1.8, y: 1.8, z: 1.8 }; // Mis à jour pour correspondre à la nouvelle échelle
+// ------------------------------------------
+// MOUSE AND INTERACTION EVENT HANDLERS
+// ------------------------------------------
+
+const originalBallScale = { x: 1.8, y: 1.8, z: 1.8 };
 const bottomPortal = document.getElementById("bottom-portal");
 
 container.addEventListener("mouseenter", function () {
@@ -390,7 +413,7 @@ container.addEventListener("mouseleave", function () {
       BALL_POSITION.x,
       BALL_POSITION.y,
       BALL_POSITION.z
-    ); // Utiliser la position constante
+    );
     racketHit = false;
     lastHitTime = 0;
     initialSpeed = 1;
@@ -408,6 +431,10 @@ container.addEventListener("mousemove", function (event) {
   tennisRacketModel.position.y = mouseY * 80 + 27;
   tennisRacketModel.position.z = 50;
 });
+
+// ------------------------------------------
+// TENNIS BALL ANIMATION AND PHYSICS SYSTEM
+// ------------------------------------------
 
 window.addEventListener("click", onMouseClick, false);
 function onMouseClick(event) {
@@ -429,11 +456,10 @@ function explodeAndRecomposeBall() {
           BALL_POSITION.x,
           BALL_POSITION.y,
           BALL_POSITION.z
-        ); // Utiliser la position constante
+        );
         tennisBallModel.scale.set(0.01, 0.01, 0.01);
-        tennisBallModel.visible = true; // Vérifier si la souris est dans le conteneur pour appliquer la bonne taille
+        tennisBallModel.visible = true;
         const rect = container.getBoundingClientRect();
-        // Utiliser une méthode plus fiable pour vérifier si la souris est dans le conteneur
         const mouseX = window.event ? window.event.clientX : 0;
         const mouseY = window.event ? window.event.clientY : 0;
         const mouseIsInside =
@@ -442,7 +468,6 @@ function explodeAndRecomposeBall() {
           mouseY >= rect.top &&
           mouseY <= rect.bottom;
 
-        // Animer vers la taille appropriée selon la position de la souris
         gsap.to(tennisBallModel.scale, {
           x: mouseIsInside ? originalBallScale.x * 0.25 : originalBallScale.x,
           y: mouseIsInside ? originalBallScale.y * 0.25 : originalBallScale.y,
@@ -454,6 +479,10 @@ function explodeAndRecomposeBall() {
     },
   });
 }
+
+// ------------------------------------------
+// TENNIS GAME PHYSICS VARIABLES
+// ------------------------------------------
 
 let racketHit = false;
 let ballVelocity = new THREE.Vector3(0, 0, 0);
@@ -468,28 +497,23 @@ let spinVelocity = 0;
 const spinDecay = 0.98;
 
 function applyForceToBall(force) {
-  // Calculer une vitesse qui tient compte de la vitesse actuelle
   let currentSpeed = ballVelocity.length();
-
-  // Limiter la vitesse maximale pour éviter des comportements erratiques
   const newSpeed = Math.min(currentSpeed * speedIncrement, maxSpeed);
 
-  // Si la vitesse actuelle est très faible, utiliser la force comme nouvelle direction
   if (currentSpeed < 0.1) {
     ballVelocity.copy(force);
   } else {
-    // Autrement, combiner les deux vecteurs pour un comportement plus réaliste
-    // Cette méthode conserve une partie de la dynamique précédente
-    ballVelocity.multiplyScalar(0.2); // Réduire l'influence de la direction précédente
-    ballVelocity.add(force.multiplyScalar(0.8)); // Donner plus de poids à la nouvelle direction
-
-    // S'assurer que la vitesse résultante a la bonne magnitude
+    ballVelocity.multiplyScalar(0.2);
+    ballVelocity.add(force.multiplyScalar(0.8));
     ballVelocity.normalize().multiplyScalar(newSpeed);
   }
 
-  // Ajouter un effet de rotation basé sur la direction latérale
   spinVelocity = Math.max(-0.3, Math.min(0.3, force.x * 0.15));
 }
+
+// ------------------------------------------
+// SCORE SYSTEM AND UI MANAGEMENT
+// ------------------------------------------
 
 let scoreContainer = document.getElementById("score-container");
 if (!scoreContainer) {
@@ -577,13 +601,11 @@ function resetScore() {
 }
 
 function updateScoreVisibility() {
-  // Vérifier que les éléments nécessaires sont disponibles
   if (!scoreContainer) {
     console.warn("scoreContainer n'est pas encore disponible");
     return;
   }
 
-  // Afficher le score uniquement sur la page 2
   if (currentPage === 2) {
     scoreContainer.style.display = "block";
     console.log("Score affiché - Page 2");
@@ -593,8 +615,6 @@ function updateScoreVisibility() {
   }
 }
 
-window.addEventListener("scroll", updateScoreVisibility);
-// Appel initial de updateScoreVisibility avec un délai pour s'assurer que tout est initialisé
 setTimeout(() => {
   console.log(
     "Appel initial de updateScoreVisibility, currentPage:",
@@ -603,31 +623,28 @@ setTimeout(() => {
   updateScoreVisibility();
 }, 100);
 
+// ------------------------------------------
+// COLLISION DETECTION AND BALL PHYSICS
+// ------------------------------------------
+
 function checkCollision() {
   const currentTime = performance.now();
   const distance = tennisRacketModel.position.distanceTo(
     tennisBallModel.position
   );
-
   if (distance < 10 && currentTime - lastHitTime > 200) {
     lastHitTime = currentTime;
     updateScore();
 
-    // Calculer un vecteur de direction basé sur la position relative de la balle et de la raquette
-    // Cela permet des rebonds plus réalistes basés sur l'angle de frappe
     const directionVector = new THREE.Vector3()
       .subVectors(tennisBallModel.position, tennisRacketModel.position)
-      .normalize(); // Ajouter une composante upward (vers le haut) pour s'assurer que la balle va toujours vers le haut
-    directionVector.y = Math.max(0.4, directionVector.y); // Valeur ajustée pour être cohérente avec la nouvelle position
+      .normalize();
+    directionVector.y = Math.max(0.4, directionVector.y);
 
-    // Ajouter une variation latérale mais plus subtile
     const lateralVariation = (Math.random() - 0.5) * 1.2;
     directionVector.x += lateralVariation;
-
-    // Normaliser à nouveau et appliquer la force
     directionVector.normalize().multiplyScalar(initialSpeed);
 
-    // Calcul de l'effet de spin (rotation) en fonction de la position de l'impact
     const spinEffect =
       (tennisBallModel.position.x - tennisRacketModel.position.x) * 0.05;
     spinVelocity = Math.max(-0.3, Math.min(0.3, spinEffect));
@@ -644,59 +661,44 @@ function updateSceneBounds() {
   const rect = container.getBoundingClientRect();
   const aspect = rect.width / rect.height;
   const distance = camera.position.z;
-
   sceneHeight = (distance * Math.tan((camera.fov * Math.PI) / 360)) / 1.3;
   sceneWidth = (sceneHeight * aspect) / 1.15;
   containerCenterX = -0.5;
-  containerCenterY = 20; // Ajusté à une valeur plus basse pour correspondre à la position de la balle
+  containerCenterY = 20;
 }
 updateSceneBounds();
 window.addEventListener("resize", updateSceneBounds);
 
 function updateBallPhysics() {
   if (ballVelocity.length() > 0.01) {
-    // Appliquer l'effet de gravité pour une trajectoire plus naturelle
-    ballVelocity.y -= 0.08; // Gravité légère
+    ballVelocity.y -= 0.08;
 
-    // Appliquer un amortissement global (résistance à l'air)
     ballVelocity.multiplyScalar(0.995);
 
-    // Mettre à jour la position de la balle
     tennisBallModel.position.add(ballVelocity);
 
     const halfBallSize = tennisBallModel.scale.x * 1.5;
     const maxX = sceneWidth / 2 - halfBallSize;
     const maxY = sceneHeight / 2 - halfBallSize;
 
-    // Rebond sur les murs latéraux
     if (tennisBallModel.position.x < containerCenterX - maxX) {
-      // Calcul d'un rebond plus naturel
-      ballVelocity.x = Math.abs(ballVelocity.x) * 0.9; // Amortissement de 10%
+      ballVelocity.x = Math.abs(ballVelocity.x) * 0.9;
       tennisBallModel.position.x = containerCenterX - maxX;
-      // Ajouter un léger effet aléatoire à la rotation
       spinVelocity += Math.random() * 0.1 - 0.05;
     } else if (tennisBallModel.position.x > containerCenterX + maxX) {
-      ballVelocity.x = -Math.abs(ballVelocity.x) * 0.9; // Amortissement de 10%
+      ballVelocity.x = -Math.abs(ballVelocity.x) * 0.9;
       tennisBallModel.position.x = containerCenterX + maxX;
-      // Ajouter un léger effet aléatoire à la rotation
       spinVelocity += Math.random() * 0.1 - 0.05;
     }
-
-    // Rebond sur le plafond
     if (tennisBallModel.position.y > containerCenterY + maxY) {
-      // Rebond avec amortissement
-      ballVelocity.y = -Math.abs(ballVelocity.y) * 0.85; // Amortissement de 15%
+      ballVelocity.y = -Math.abs(ballVelocity.y) * 0.85;
       tennisBallModel.position.y = containerCenterY + maxY;
-      // Ajouter un léger effet de rotation
       spinVelocity += ballVelocity.x * 0.03;
-    }
-    // Si la balle tombe en bas
-    else if (tennisBallModel.position.y < containerCenterY - maxY) {
+    } else if (tennisBallModel.position.y < containerCenterY - maxY) {
       resetScore();
       explodeAndRecomposeBall();
     }
 
-    // Appliquer une rotation plus naturelle basée sur la direction du mouvement
     if (Math.abs(ballVelocity.x) > 0.1) {
       tennisBallModel.rotation.z -= ballVelocity.x * 0.03;
     }
@@ -706,8 +708,11 @@ function updateBallPhysics() {
   }
 }
 
+// ------------------------------------------
+// 3D MODEL LOADER AND MANAGER SETUP
+// ------------------------------------------
+
 const loader = new THREE.GLTFLoader();
-// Ajouter une fonction pour gérer les erreurs de chargement
 loader.manager = new THREE.LoadingManager();
 loader.manager.onError = function (url) {
   console.error("Erreur lors du chargement de:", url);
@@ -885,6 +890,10 @@ function loadTennisRacketModel() {
   });
 }
 
+// ------------------------------------------
+// SCENE INITIALIZATION AND CAMERA CONTROLS
+// ------------------------------------------
+
 function initializeCameraAndScene() {
   const width = window.innerWidth * 0.5;
   const height = window.innerHeight;
@@ -906,6 +915,10 @@ function initializeCameraAndScene() {
   controls.target.set(0, 0, 0);
   controls.update();
 }
+
+// ------------------------------------------
+// PAGE TRANSITIONS AND NAVIGATION
+// ------------------------------------------
 
 function transitionToPadel() {
   terrainModel.visible = false;
@@ -948,7 +961,9 @@ function transitionToFirstPage() {
   document.getElementById("second-page").style.display = "none";
   document.getElementById("third-page").style.display = "none";
 
-  // Mettre à jour immédiatement le texte d'aide
+  // ------------------------------------------
+  // HELP TEXT MANAGEMENT
+  // ------------------------------------------
   if (window.languageManager) {
     const texts = window.languageManager.getTexts();
     const canvasInfo = document.getElementById("canvas-info");
@@ -999,7 +1014,9 @@ function transitionToSecondPage() {
   document.getElementById("second-page").style.display = "block";
   document.getElementById("third-page").style.display = "none";
 
-  // Mettre à jour immédiatement le texte d'aide
+  // ------------------------------------------
+  // HELP TEXT MANAGEMENT
+  // ------------------------------------------
   if (window.languageManager) {
     const texts = window.languageManager.getTexts();
     const canvasInfo = document.getElementById("canvas-info");
@@ -1007,13 +1024,12 @@ function transitionToSecondPage() {
       canvasInfo.textContent = texts.helpTextSecondPage;
     }
   }
-
-  tennisBallModel.scale.set(1.8, 1.8, 1.8); // Taille harmonisée avec la nouvelle échelle
+  tennisBallModel.scale.set(1.8, 1.8, 1.8);
   tennisBallModel.position.set(
     BALL_POSITION.x,
     BALL_POSITION.y,
     BALL_POSITION.z
-  ); // Utiliser la position constante
+  );
   tennisBallModel.visible = true;
 
   resetBall();
@@ -1139,7 +1155,7 @@ function transitionToSecondPage() {
                 delay: 0.2,
                 duration: 2.5,
                 x: 0,
-                y: 45, // Position légèrement plus basse pour la caméra
+                y: 45,
                 z: 100,
                 ease: "power2.inOut",
                 onUpdate: function () {
@@ -1161,7 +1177,9 @@ function transitionToThirdPage(padelRacket, padelCourt) {
   document.getElementById("second-page").style.display = "none";
   document.getElementById("third-page").style.display = "block";
 
-  // Mettre à jour immédiatement le texte d'aide
+  // ------------------------------------------
+  // HELP TEXT MANAGEMENT
+  // ------------------------------------------
   if (window.languageManager) {
     const texts = window.languageManager.getTexts();
     const canvasInfo = document.getElementById("canvas-info");
@@ -1253,9 +1271,11 @@ function unloadPage3Elements() {
   });
   balls = [];
   ballModels = [];
-
-  camera.position.set(0, 45, 150); // Position ajustée pour être cohérente
-  camera.lookAt(0, 25, 0); // Regarde vers la hauteur où se trouve la balle
+  // ------------------------------------------
+  // CAMERA RESET AND POSITIONING
+  // ------------------------------------------
+  camera.position.set(0, 45, 150);
+  camera.lookAt(0, 25, 0);
 
   console.log("Les éléments de la page 3 ont été déchargés.");
 }
@@ -1268,7 +1288,9 @@ function returnToSecondPage() {
   document.getElementById("third-page").style.display = "none";
   document.getElementById("second-page").style.display = "block";
 
-  // Mettre à jour immédiatement le texte d'aide
+  // ------------------------------------------
+  // HELP TEXT MANAGEMENT
+  // ------------------------------------------
   if (window.languageManager) {
     const texts = window.languageManager.getTexts();
     const canvasInfo = document.getElementById("canvas-info");
@@ -1287,19 +1309,23 @@ function returnToSecondPage() {
   tennisBallModel.visible = true;
   resetBall();
   updateScoreVisibility();
-
-  // Décharger les éléments de la page 3
+  // ------------------------------------------
+  // SCENE CLEANUP AND RESET
+  // ------------------------------------------
   unloadPage3Elements();
 
-  // Reproduire exactement la même séquence d'animation que transitionToSecondPage
-  // Étape 1: Positionner la balle hors écran pour l'animation
+  // ------------------------------------------
+  // BALL INITIALIZATION AND SETUP
+  // ------------------------------------------
   tennisBallModel.position.set(-2000, 2000, 0);
   tennisBallModel.visible = true;
 
   let rotationY = 0;
   let rotationX = 0;
 
-  // Étape 2: Animation de la balle qui arrive
+  // ------------------------------------------
+  // BALL ENTRANCE ANIMATION
+  // ------------------------------------------
   gsap.to(tennisBallModel.position, {
     x: -10,
     y: 15,
@@ -1312,7 +1338,9 @@ function returnToSecondPage() {
       tennisBallModel.rotation.set(rotationX, rotationY, 0);
     },
     onComplete: function () {
-      // Étape 3: Positionner la balle à sa place finale
+      // ------------------------------------------
+      // BALL POSITIONING AND ANIMATION
+      // ------------------------------------------
       gsap.to(tennisBallModel.position, {
         x: 0,
         y: 24,
@@ -1325,15 +1353,16 @@ function returnToSecondPage() {
         y: Math.PI + rotationY,
         duration: 1.5,
         ease: "power2.out",
-      }); // Finaliser la transition
+      });
       scoreContainer.style.display = "block";
       isScrolling = false;
       currentPage = 2;
       updateScoreVisibility();
     },
   });
-
-  // Étape 4: Animation de la caméra identique à transitionToSecondPage
+  // ------------------------------------------
+  // CAMERA ANIMATION AND TRANSITIONS
+  // ------------------------------------------
   gsap.to(camera.position, {
     duration: 0.5,
     x: 0,
@@ -1369,6 +1398,10 @@ loadPadelModels((padelRacket, padelCourt) => {
     }
   });
 });
+
+// ------------------------------------------
+// CANNON.JS PHYSICS SYSTEM FOR PADEL GAME
+// ------------------------------------------
 
 const world = new CANNON.World();
 world.gravity.set(0, -15, 0);
@@ -1420,6 +1453,10 @@ const angularDamping = 0.9;
 
 const ballRadius = 0.55;
 
+// ------------------------------------------
+// PADEL GAME BALL PHYSICS
+// ------------------------------------------
+
 function setupDroppingBall() {
   const newBallModel = tennisBallModel.clone();
   newBallModel.scale.set(0.2, 0.2, 0.2);
@@ -1457,9 +1494,10 @@ function updatePhysics() {
     ballModel.quaternion.copy(ballBody.quaternion);
 
     ballBody.angularVelocity.set(0, 0, 0);
-
     if (ballBody.position.y < 0.5) {
-      // Ajusté pour correspondre au nouveau sol
+      // ------------------------------------------
+      // BALL CLEANUP AND REMOVAL
+      // ------------------------------------------
       ballModel.visible = false;
       scene.remove(ballModel);
       world.removeBody(ballBody);
@@ -1472,8 +1510,9 @@ function updatePhysics() {
 window.addEventListener("keydown", function (event) {
   if (event.code === "Space" && currentPage === 3) {
     console.log("Espace pressé, page 3, nombre de balles:", balls.length);
-
-    // Limiter à 5 raquettes maximum
+    // ------------------------------------------
+    // BALL LIMIT AND NOTIFICATION MANAGEMENT
+    // ------------------------------------------
     if (balls.length < 5) {
       setupDroppingBall();
       console.log(
@@ -1490,22 +1529,24 @@ window.addEventListener("keydown", function (event) {
       }
     } else {
       console.log("Limite de 5 raquettes atteinte !");
-      console.log("Affichage de la notification...");
-
-      // Afficher la notification
+      console.log("Affichage de la notification..."); // ------------------------------------------
+      // NOTIFICATION DISPLAY SYSTEM
+      // ------------------------------------------
       limitNotification.style.display = "block";
       console.log(
         "Notification affichée, style:",
         limitNotification.style.display
       );
 
-      // Annuler le timer précédent s'il existe
+      // ------------------------------------------
+      // TIMER MANAGEMENT
+      // ------------------------------------------
       if (notificationTimer) {
         clearTimeout(notificationTimer);
         console.log("Timer précédent annulé");
       }
 
-      // Faire disparaître la notification après 3 secondes
+      // Set timeout for notification
       notificationTimer = setTimeout(() => {
         console.log("Timer expiré, masquage de la notification");
         limitNotification.style.display = "none";
@@ -1516,6 +1557,10 @@ window.addEventListener("keydown", function (event) {
     }
   }
 });
+
+// ------------------------------------------
+// PADEL COURT WALL CONSTRUCTION
+// ------------------------------------------
 
 function createWall(position, size) {
   const wall = new CANNON.Body({
@@ -1555,6 +1600,10 @@ createWall(new CANNON.Vec3(0, wallHeight / 2, 40 - courtLength / 2), {
 });
 
 const clock = new THREE.Clock();
+
+// ------------------------------------------
+// MAIN ANIMATION AND RENDER LOOP
+// ------------------------------------------
 
 function animate() {
   requestAnimationFrame(animate);
