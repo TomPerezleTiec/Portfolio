@@ -1169,15 +1169,100 @@ function unloadPage3Elements() {
 }
 
 function returnToSecondPage() {
-  updateScoreVisibility();
+  console.log("🔄 returnToSecondPage called - isScrolling:", isScrolling);
   if (isScrolling) return;
   isScrolling = true;
-  unloadPage3Elements();
+
   document.getElementById("third-page").style.display = "none";
   document.getElementById("second-page").style.display = "block";
-  scoreContainer.style.display = "block";
-  currentPage = 2;
-  isScrolling = false;
+
+  // Mettre à jour immédiatement le texte d'aide
+  if (window.languageManager) {
+    const texts = window.languageManager.getTexts();
+    const canvasInfo = document.getElementById("canvas-info");
+    if (canvasInfo) {
+      canvasInfo.textContent = texts.helpTextSecondPage;
+    }
+  }
+
+  // Configuration initiale de la balle exactement comme dans transitionToSecondPage
+  tennisBallModel.scale.set(1.8, 1.8, 1.8);
+  tennisBallModel.position.set(
+    BALL_POSITION.x,
+    BALL_POSITION.y,
+    BALL_POSITION.z
+  );
+  tennisBallModel.visible = true;
+  resetBall();
+  updateScoreVisibility();
+
+  // Décharger les éléments de la page 3
+  unloadPage3Elements();
+
+  // Reproduire exactement la même séquence d'animation que transitionToSecondPage
+  // Étape 1: Positionner la balle hors écran pour l'animation
+  tennisBallModel.position.set(-2000, 2000, 0);
+  tennisBallModel.visible = true;
+
+  let rotationY = 0;
+  let rotationX = 0;
+
+  // Étape 2: Animation de la balle qui arrive
+  gsap.to(tennisBallModel.position, {
+    x: -10,
+    y: 15,
+    z: 35,
+    duration: 2,
+    ease: "power2.out",
+    onUpdate: function () {
+      rotationY += 0.15;
+      rotationX += 0.05;
+      tennisBallModel.rotation.set(rotationX, rotationY, 0);
+    },
+    onComplete: function () {
+      // Étape 3: Positionner la balle à sa place finale
+      gsap.to(tennisBallModel.position, {
+        x: 0,
+        y: 24,
+        z: 50,
+        duration: 1.2,
+        ease: "power2.out",
+      });
+      gsap.to(tennisBallModel.rotation, {
+        x: Math.PI + rotationX,
+        y: Math.PI + rotationY,
+        duration: 1.5,
+        ease: "power2.out",
+      });
+
+      // Finaliser la transition
+      scoreContainer.style.display = "block";
+      isScrolling = false;
+      currentPage = 2;
+    },
+  });
+
+  // Étape 4: Animation de la caméra identique à transitionToSecondPage
+  gsap.to(camera.position, {
+    duration: 0.5,
+    x: 0,
+    y: camera.position.y + 50,
+    z: camera.position.z + 200,
+    ease: "power2.out",
+    onComplete: function () {
+      gsap.to(camera.position, {
+        delay: 0.2,
+        duration: 2.5,
+        x: 0,
+        y: 45,
+        z: 100,
+        ease: "power2.inOut",
+        onUpdate: function () {
+          camera.lookAt(tennisBallModel.position);
+        },
+      });
+    },
+  });
 }
 
 loadPadelModels((padelRacket, padelCourt) => {
