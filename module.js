@@ -8,6 +8,10 @@ console.log(
   typeof THREE.OrbitControls !== "undefined"
 );
 
+// Initialisation de la variable currentPage dès le début
+let currentPage = 1;
+console.log("currentPage initialisé à:", currentPage);
+
 const scene = new THREE.Scene();
 const aspectRatio = (window.innerWidth * 0.5) / window.innerHeight;
 const camera = new THREE.PerspectiveCamera(
@@ -573,18 +577,31 @@ function resetScore() {
 }
 
 function updateScoreVisibility() {
-  const secondPage = document.getElementById("second-page");
-  const rect = secondPage.getBoundingClientRect();
+  // Vérifier que les éléments nécessaires sont disponibles
+  if (!scoreContainer) {
+    console.warn("scoreContainer n'est pas encore disponible");
+    return;
+  }
 
-  if (rect.top < window.innerHeight && rect.bottom >= 0) {
+  // Afficher le score uniquement sur la page 2
+  if (currentPage === 2) {
     scoreContainer.style.display = "block";
+    console.log("Score affiché - Page 2");
   } else {
     scoreContainer.style.display = "none";
+    console.log("Score masqué - Page", currentPage);
   }
 }
 
 window.addEventListener("scroll", updateScoreVisibility);
-updateScoreVisibility();
+// Appel initial de updateScoreVisibility avec un délai pour s'assurer que tout est initialisé
+setTimeout(() => {
+  console.log(
+    "Appel initial de updateScoreVisibility, currentPage:",
+    currentPage
+  );
+  updateScoreVisibility();
+}, 100);
 
 function checkCollision() {
   const currentTime = performance.now();
@@ -706,92 +723,165 @@ console.log("Chemin actuel:", window.location.href);
 
 function loadPadelModels(callback) {
   const promises = [
-    new Promise((resolve) => {
-      loader.load("models/padel_racket/scene.gltf", function (gltf) {
-        padelRacketModel = gltf.scene;
-        padelRacketModel.scale.set(100, 100, 100);
-        padelRacketModel.rotation.y = 190;
-        padelRacketModel.position.set(0, 0, -2);
-        padelRacketModel.visible = false;
-        scene.add(padelRacketModel);
-        resolve();
-      });
+    new Promise((resolve, reject) => {
+      console.log("Chargement modèle padel racket...");
+      loader.load(
+        "models/padel_racket/scene.gltf",
+        function (gltf) {
+          console.log("Modèle padel racket chargé avec succès");
+          padelRacketModel = gltf.scene;
+          padelRacketModel.scale.set(100, 100, 100);
+          padelRacketModel.rotation.y = 190;
+          padelRacketModel.position.set(0, 0, -2);
+          padelRacketModel.visible = false;
+          scene.add(padelRacketModel);
+          resolve();
+        },
+        function (progress) {
+          console.log("Progression padel racket:", progress);
+        },
+        function (error) {
+          console.error("Erreur chargement padel racket:", error);
+          reject(error);
+        }
+      );
     }),
-    new Promise((resolve) => {
-      loader.load("models/padel_court/scene.gltf", function (gltf) {
-        padelCourtModel = gltf.scene;
-        padelCourtModel.scale.set(0.5, 0.5, 0.5);
-        padelCourtModel.position.set(0, 0, 40);
-        padelCourtModel.visible = false;
-        scene.add(padelCourtModel);
-        resolve();
-      });
+    new Promise((resolve, reject) => {
+      console.log("Chargement modèle padel court...");
+      loader.load(
+        "models/padel_court/scene.gltf",
+        function (gltf) {
+          console.log("Modèle padel court chargé avec succès");
+          padelCourtModel = gltf.scene;
+          padelCourtModel.scale.set(0.5, 0.5, 0.5);
+          padelCourtModel.position.set(0, 0, 40);
+          padelCourtModel.visible = false;
+          scene.add(padelCourtModel);
+          resolve();
+        },
+        function (progress) {
+          console.log("Progression padel court:", progress);
+        },
+        function (error) {
+          console.error("Erreur chargement padel court:", error);
+          reject(error);
+        }
+      );
     }),
   ];
 
-  Promise.all(promises).then(() => {
-    padelModelsLoaded = true;
-    console.log("Modèles de padel chargés.");
-    if (callback) callback(padelRacketModel, padelCourtModel);
-  });
+  Promise.all(promises)
+    .then(() => {
+      padelModelsLoaded = true;
+      console.log("Modèles de padel chargés avec succès.");
+      if (callback) callback(padelRacketModel, padelCourtModel);
+    })
+    .catch((error) => {
+      console.error("Erreur lors du chargement des modèles padel:", error);
+    });
 }
 
 const loadingContainer = document.getElementById("loading-container");
 loadingContainer.style.display = "block";
 
-loader.load("models/tennis_court/scene.gltf", function (gltf) {
-  terrainModel = gltf.scene;
-  terrainModel.scale.set(0.1, 0.15, 0.15);
-  scene.add(terrainModel);
+console.log("Début du chargement du court de tennis...");
+loader.load(
+  "models/tennis_court/scene.gltf",
+  function (gltf) {
+    console.log("Modèle tennis court chargé avec succès");
+    terrainModel = gltf.scene;
+    terrainModel.scale.set(0.1, 0.15, 0.15);
+    scene.add(terrainModel);
 
-  mixer = new THREE.AnimationMixer(terrainModel);
+    mixer = new THREE.AnimationMixer(terrainModel);
 
-  if (gltf.animations && gltf.animations.length > 0) {
-    gltf.animations.forEach((clip) => {
-      const action = mixer.clipAction(clip);
-      action.play();
-      action.loop = THREE.LoopRepeat;
-    });
+    if (gltf.animations && gltf.animations.length > 0) {
+      gltf.animations.forEach((clip) => {
+        const action = mixer.clipAction(clip);
+        action.play();
+        action.loop = THREE.LoopRepeat;
+      });
+    }
+
+    Promise.all([loadTennisBallModel(), loadTennisRacketModel()])
+      .then(() => {
+        console.log("Tous les modèles de tennis ont été chargés avec succès");
+        initializeCameraAndScene();
+
+        loadingContainer.style.opacity = "0";
+        loadingContainer.style.transform = "translate(-50%, -50%) scale(0.9)";
+
+        setTimeout(() => {
+          loadingContainer.style.display = "none";
+        }, 500);
+      })
+      .catch((error) => {
+        console.error(
+          "Erreur lors du chargement des modèles de tennis:",
+          error
+        );
+        loadingContainer.innerHTML = "Erreur de chargement des modèles";
+      });
+  },
+  function (progress) {
+    console.log("Progression tennis court:", progress);
+  },
+  function (error) {
+    console.error("Erreur chargement tennis court:", error);
+    loadingContainer.innerHTML = "Erreur de chargement du court de tennis";
   }
-
-  Promise.all([loadTennisBallModel(), loadTennisRacketModel()]).then(() => {
-    initializeCameraAndScene();
-
-    loadingContainer.style.opacity = "0";
-    loadingContainer.style.transform = "translate(-50%, -50%) scale(0.9)";
-
-    setTimeout(() => {
-      loadingContainer.style.display = "none";
-    }, 500);
-  });
-});
+);
 
 function loadTennisBallModel() {
-  return new Promise((resolve) => {
-    loader.load("models/tennis_ball/scene.gltf", function (gltf) {
-      const ballScene = gltf.scene;
-      ballScene.scale.set(1.5, 1.5, 1.5); // Taille réduite pour une meilleure proportion
-      // Utiliser la nouvelle fonction centerPivot qui renvoie un groupe avec le pivot centré
-      tennisBallModel = centerPivot(ballScene);
-      tennisBallModel.visible = false;
-      resetBall();
-      scene.add(tennisBallModel);
-      resolve();
-    });
+  return new Promise((resolve, reject) => {
+    console.log("Chargement modèle tennis ball...");
+    loader.load(
+      "models/tennis_ball/scene.gltf",
+      function (gltf) {
+        console.log("Modèle tennis ball chargé avec succès");
+        const ballScene = gltf.scene;
+        ballScene.scale.set(1.5, 1.5, 1.5); // Taille réduite pour une meilleure proportion
+        // Utiliser la nouvelle fonction centerPivot qui renvoie un groupe avec le pivot centré
+        tennisBallModel = centerPivot(ballScene);
+        tennisBallModel.visible = false;
+        resetBall();
+        scene.add(tennisBallModel);
+        resolve();
+      },
+      function (progress) {
+        console.log("Progression tennis ball:", progress);
+      },
+      function (error) {
+        console.error("Erreur chargement tennis ball:", error);
+        reject(error);
+      }
+    );
   });
 }
 
 function loadTennisRacketModel() {
-  return new Promise((resolve) => {
-    loader.load("models/tennis_racket/scene.gltf", function (gltf) {
-      tennisRacketModel = gltf.scene;
-      tennisRacketModel.scale.set(1.5, 1.5, 1.5);
-      tennisRacketModel.visible = false;
-      tennisRacketModel.position.z = 0;
-      scene.add(tennisRacketModel);
-      initializeRacket();
-      resolve();
-    });
+  return new Promise((resolve, reject) => {
+    console.log("Chargement modèle tennis racket...");
+    loader.load(
+      "models/tennis_racket/scene.gltf",
+      function (gltf) {
+        console.log("Modèle tennis racket chargé avec succès");
+        tennisRacketModel = gltf.scene;
+        tennisRacketModel.scale.set(1.5, 1.5, 1.5);
+        tennisRacketModel.visible = false;
+        tennisRacketModel.position.z = 0;
+        scene.add(tennisRacketModel);
+        initializeRacket();
+        resolve();
+      },
+      function (progress) {
+        console.log("Progression tennis racket:", progress);
+      },
+      function (error) {
+        console.error("Erreur chargement tennis racket:", error);
+        reject(error);
+      }
+    );
   });
 }
 
@@ -849,7 +939,6 @@ function transitionToPadel() {
   });
 }
 
-let currentPage = 1;
 let isScrolling = false;
 
 function transitionToFirstPage() {
@@ -894,6 +983,7 @@ function transitionToFirstPage() {
         onComplete: function () {
           isScrolling = false;
           currentPage = 1;
+          updateScoreVisibility();
         },
       });
     },
@@ -1034,6 +1124,7 @@ function transitionToSecondPage() {
               });
               isScrolling = false;
               currentPage = 2;
+              updateScoreVisibility();
             },
           });
 
@@ -1144,6 +1235,7 @@ function transitionToThirdPage(padelRacket, padelCourt) {
           );
           isScrolling = false;
           currentPage = 3;
+          updateScoreVisibility();
         },
       });
     },
@@ -1233,12 +1325,11 @@ function returnToSecondPage() {
         y: Math.PI + rotationY,
         duration: 1.5,
         ease: "power2.out",
-      });
-
-      // Finaliser la transition
+      }); // Finaliser la transition
       scoreContainer.style.display = "block";
       isScrolling = false;
       currentPage = 2;
+      updateScoreVisibility();
     },
   });
 
