@@ -2,17 +2,7 @@
 // INITIALIZATION AND DEPENDENCIES CHECK
 // ------------------------------------------
 
-console.log("Module.js chargé");
-
-console.log("THREE disponible:", typeof THREE !== "undefined");
-console.log("GLTFLoader disponible:", typeof THREE.GLTFLoader !== "undefined");
-console.log(
-  "OrbitControls disponible:",
-  typeof THREE.OrbitControls !== "undefined"
-);
-
 let currentPage = 1;
-console.log("currentPage initialisé à:", currentPage);
 
 // ------------------------------------------
 // THREE.JS SCENE SETUP
@@ -605,21 +595,14 @@ function updateScoreVisibility() {
     console.warn("scoreContainer n'est pas encore disponible");
     return;
   }
-
   if (currentPage === 2) {
     scoreContainer.style.display = "block";
-    console.log("Score affiché - Page 2");
   } else {
     scoreContainer.style.display = "none";
-    console.log("Score masqué - Page", currentPage);
   }
 }
 
 setTimeout(() => {
-  console.log(
-    "Appel initial de updateScoreVisibility, currentPage:",
-    currentPage
-  );
   updateScoreVisibility();
 }, 100);
 
@@ -721,19 +704,12 @@ loader.manager.onError = function (url) {
 let padelRacketModel, padelCourtModel;
 let padelModelsLoaded = false;
 
-console.log(
-  "Début du chargement des modèles - Vérifier les chemins des modèles"
-);
-console.log("Chemin actuel:", window.location.href);
-
 function loadPadelModels(callback) {
   const promises = [
     new Promise((resolve, reject) => {
-      console.log("Chargement modèle padel racket...");
       loader.load(
         "models/padel_racket/scene.gltf",
         function (gltf) {
-          console.log("Modèle padel racket chargé avec succès");
           padelRacketModel = gltf.scene;
           padelRacketModel.scale.set(100, 100, 100);
           padelRacketModel.rotation.y = 190;
@@ -742,9 +718,7 @@ function loadPadelModels(callback) {
           scene.add(padelRacketModel);
           resolve();
         },
-        function (progress) {
-          console.log("Progression padel racket:", progress);
-        },
+        undefined,
         function (error) {
           console.error("Erreur chargement padel racket:", error);
           reject(error);
@@ -752,11 +726,9 @@ function loadPadelModels(callback) {
       );
     }),
     new Promise((resolve, reject) => {
-      console.log("Chargement modèle padel court...");
       loader.load(
         "models/padel_court/scene.gltf",
         function (gltf) {
-          console.log("Modèle padel court chargé avec succès");
           padelCourtModel = gltf.scene;
           padelCourtModel.scale.set(0.5, 0.5, 0.5);
           padelCourtModel.position.set(0, 0, 40);
@@ -764,9 +736,7 @@ function loadPadelModels(callback) {
           scene.add(padelCourtModel);
           resolve();
         },
-        function (progress) {
-          console.log("Progression padel court:", progress);
-        },
+        undefined,
         function (error) {
           console.error("Erreur chargement padel court:", error);
           reject(error);
@@ -778,7 +748,6 @@ function loadPadelModels(callback) {
   Promise.all(promises)
     .then(() => {
       padelModelsLoaded = true;
-      console.log("Modèles de padel chargés avec succès.");
       if (callback) callback(padelRacketModel, padelCourtModel);
     })
     .catch((error) => {
@@ -789,11 +758,9 @@ function loadPadelModels(callback) {
 const loadingContainer = document.getElementById("loading-container");
 loadingContainer.style.display = "block";
 
-console.log("Début du chargement du court de tennis...");
 loader.load(
   "models/tennis_court/scene.gltf",
   function (gltf) {
-    console.log("Modèle tennis court chargé avec succès");
     terrainModel = gltf.scene;
     terrainModel.scale.set(0.1, 0.15, 0.15);
     scene.add(terrainModel);
@@ -810,7 +777,6 @@ loader.load(
 
     Promise.all([loadTennisBallModel(), loadTennisRacketModel()])
       .then(() => {
-        console.log("Tous les modèles de tennis ont été chargés avec succès");
         initializeCameraAndScene();
 
         loadingContainer.style.opacity = "0";
@@ -828,9 +794,7 @@ loader.load(
         loadingContainer.innerHTML = "Erreur de chargement des modèles";
       });
   },
-  function (progress) {
-    console.log("Progression tennis court:", progress);
-  },
+  undefined,
   function (error) {
     console.error("Erreur chargement tennis court:", error);
     loadingContainer.innerHTML = "Erreur de chargement du court de tennis";
@@ -839,23 +803,18 @@ loader.load(
 
 function loadTennisBallModel() {
   return new Promise((resolve, reject) => {
-    console.log("Chargement modèle tennis ball...");
     loader.load(
       "models/tennis_ball/scene.gltf",
       function (gltf) {
-        console.log("Modèle tennis ball chargé avec succès");
         const ballScene = gltf.scene;
-        ballScene.scale.set(1.5, 1.5, 1.5); // Taille réduite pour une meilleure proportion
-        // Utiliser la nouvelle fonction centerPivot qui renvoie un groupe avec le pivot centré
+        ballScene.scale.set(1.5, 1.5, 1.5);
         tennisBallModel = centerPivot(ballScene);
         tennisBallModel.visible = false;
         resetBall();
         scene.add(tennisBallModel);
         resolve();
       },
-      function (progress) {
-        console.log("Progression tennis ball:", progress);
-      },
+      undefined,
       function (error) {
         console.error("Erreur chargement tennis ball:", error);
         reject(error);
@@ -866,11 +825,9 @@ function loadTennisBallModel() {
 
 function loadTennisRacketModel() {
   return new Promise((resolve, reject) => {
-    console.log("Chargement modèle tennis racket...");
     loader.load(
       "models/tennis_racket/scene.gltf",
       function (gltf) {
-        console.log("Modèle tennis racket chargé avec succès");
         tennisRacketModel = gltf.scene;
         tennisRacketModel.scale.set(1.5, 1.5, 1.5);
         tennisRacketModel.visible = false;
@@ -879,9 +836,7 @@ function loadTennisRacketModel() {
         initializeRacket();
         resolve();
       },
-      function (progress) {
-        console.log("Progression tennis racket:", progress);
-      },
+      undefined,
       function (error) {
         console.error("Erreur chargement tennis racket:", error);
         reject(error);
@@ -1235,11 +1190,7 @@ function transitionToThirdPage(padelRacket, padelCourt) {
       padelRacket.visible = true;
       padelCourt.visible = true;
       tennisBallModel.visible = false;
-
       camera.position.set(0, 5, 1);
-      console.log(
-        "Transition vers la troisième page commencée : caméra en position de départ."
-      );
 
       gsap.to(camera.position, {
         duration: 4,
@@ -1248,9 +1199,6 @@ function transitionToThirdPage(padelRacket, padelCourt) {
         z: 60,
         ease: "power2.inOut",
         onComplete: () => {
-          console.log(
-            "Transition vers la troisième page terminée : caméra en position finale."
-          );
           isScrolling = false;
           currentPage = 3;
           updateScoreVisibility();
@@ -1276,12 +1224,9 @@ function unloadPage3Elements() {
   // ------------------------------------------
   camera.position.set(0, 45, 150);
   camera.lookAt(0, 25, 0);
-
-  console.log("Les éléments de la page 3 ont été déchargés.");
 }
 
 function returnToSecondPage() {
-  console.log("🔄 returnToSecondPage called - isScrolling:", isScrolling);
   if (isScrolling) return;
   isScrolling = true;
 
@@ -1509,16 +1454,11 @@ function updatePhysics() {
 
 window.addEventListener("keydown", function (event) {
   if (event.code === "Space" && currentPage === 3) {
-    console.log("Espace pressé, page 3, nombre de balles:", balls.length);
     // ------------------------------------------
     // BALL LIMIT AND NOTIFICATION MANAGEMENT
     // ------------------------------------------
     if (balls.length < 5) {
       setupDroppingBall();
-      console.log(
-        "Appui sur Espace - Nouvelle balle en chute. Total:",
-        balls.length
-      );
       // Cacher la notification si elle était visible
       if (limitNotification.style.display === "block") {
         limitNotification.style.display = "none";
@@ -1528,15 +1468,10 @@ window.addEventListener("keydown", function (event) {
         }
       }
     } else {
-      console.log("Limite de 5 raquettes atteinte !");
-      console.log("Affichage de la notification..."); // ------------------------------------------
+      // ------------------------------------------
       // NOTIFICATION DISPLAY SYSTEM
       // ------------------------------------------
       limitNotification.style.display = "block";
-      console.log(
-        "Notification affichée, style:",
-        limitNotification.style.display
-      );
 
       // ------------------------------------------
       // TIMER MANAGEMENT
