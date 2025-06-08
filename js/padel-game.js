@@ -44,7 +44,7 @@ const groundBody = new CANNON.Body({
   shape: new CANNON.Plane(),
 });
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-groundBody.position.set(0, -0.5, 40);
+groundBody.position.set(0, 0.5, 40); // Remonté de -0.5 à 0.5
 world.addBody(groundBody);
 
 // Tableaux pour stocker les balles
@@ -135,8 +135,8 @@ export function updatePhysics() {
     ballModel.quaternion.copy(ballBody.quaternion);
 
     ballBody.angularVelocity.set(0, 0, 0);
-
-    if (ballBody.position.y < -0.5) {
+    if (ballBody.position.y < 0.5) {
+      // Ajusté pour correspondre au nouveau sol
       ballModel.visible = false;
       scene.remove(ballModel);
       world.removeBody(ballBody);

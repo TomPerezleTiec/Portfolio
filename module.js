@@ -1220,7 +1220,7 @@ const groundBody = new CANNON.Body({
 });
 
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-groundBody.position.set(0, -0.5, 40);
+groundBody.position.set(0, 0.5, 40);
 world.addBody(groundBody);
 
 let balls = [];
@@ -1269,7 +1269,8 @@ function updatePhysics() {
 
     ballBody.angularVelocity.set(0, 0, 0);
 
-    if (ballBody.position.y < -0.5) {
+    if (ballBody.position.y < 0.5) {
+      // Ajusté pour correspondre au nouveau sol
       ballModel.visible = false;
       scene.remove(ballModel);
       world.removeBody(ballBody);
@@ -1279,36 +1280,10 @@ function updatePhysics() {
   });
 }
 
-// Créer un élément pour afficher la notification de limite
-let limitNotification = document.createElement("div");
-limitNotification.id = "limit-notification";
-limitNotification.style.position = "fixed";
-limitNotification.style.top = "20%";
-limitNotification.style.left = "50%";
-limitNotification.style.transform = "translate(-50%, -50%)";
-limitNotification.style.padding = "10px 20px";
-limitNotification.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
-limitNotification.style.color = "white";
-limitNotification.style.borderRadius = "5px";
-limitNotification.style.fontWeight = "bold";
-limitNotification.style.zIndex = "1000";
-limitNotification.style.display = "none";
-limitNotification.style.textAlign = "center";
-limitNotification.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
-limitNotification.style.border = "2px solid white";
-// Utilisation du gestionnaire de langues si disponible
-limitNotification.textContent = window.languageManager
-  ? window.languageManager.getTranslation("limitReached")
-  : "Limite de 5 balles atteinte !";
-document.body.appendChild(limitNotification);
-
-// Écouter les changements de langue
-document.addEventListener("languageChanged", function (event) {
-  limitNotification.textContent = event.detail.texts.limitReached;
-});
-
 window.addEventListener("keydown", function (event) {
   if (event.code === "Space" && currentPage === 3) {
+    console.log("Espace pressé, page 3, nombre de balles:", balls.length);
+
     // Limiter à 5 raquettes maximum
     if (balls.length < 5) {
       setupDroppingBall();
@@ -1316,14 +1291,39 @@ window.addEventListener("keydown", function (event) {
         "Appui sur Espace - Nouvelle balle en chute. Total:",
         balls.length
       );
+      // Cacher la notification si elle était visible
+      if (limitNotification.style.display === "block") {
+        limitNotification.style.display = "none";
+        if (notificationTimer) {
+          clearTimeout(notificationTimer);
+          notificationTimer = null;
+        }
+      }
     } else {
       console.log("Limite de 5 raquettes atteinte !");
+      console.log("Affichage de la notification...");
+
       // Afficher la notification
       limitNotification.style.display = "block";
-      // Faire disparaître la notification après 2 secondes
-      setTimeout(() => {
+      console.log(
+        "Notification affichée, style:",
+        limitNotification.style.display
+      );
+
+      // Annuler le timer précédent s'il existe
+      if (notificationTimer) {
+        clearTimeout(notificationTimer);
+        console.log("Timer précédent annulé");
+      }
+
+      // Faire disparaître la notification après 3 secondes
+      notificationTimer = setTimeout(() => {
+        console.log("Timer expiré, masquage de la notification");
         limitNotification.style.display = "none";
-      }, 2000);
+        notificationTimer = null;
+      }, 3000);
+
+      console.log("Timer démarré pour 3 secondes");
     }
   }
 });
