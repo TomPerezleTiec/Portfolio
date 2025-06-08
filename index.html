@@ -17,10 +17,12 @@
       <div id="bottom-portal"></div>
       <div id="loading-container">
         <div id="loading-ball"></div>
-        <p>Chargement...</p>
+        <p data-i18n="loadingText">Chargement...</p>
       </div>
       <div id="help-text">
-        <p id="canvas-info">Vous pouvez naviguer dans l'environnement 3D</p>
+        <p id="canvas-info" data-i18n="helpTextFirstPage">
+          Vous pouvez naviguer dans l'environnement 3D
+        </p>
       </div>
     </div>
     <div class="content">
@@ -28,9 +30,11 @@
       <div id="first-page" class="page">
         <div id="number-3d-container"></div>
         <div id="titles">
-          <p id="info">Vous pouvez naviguer dans l'environnement 3D</p>
-          <div id="top-title"></div>
-          <div id="bottom-title"></div>
+          <p id="info" data-i18n="helpTextFirstPage">
+            Vous pouvez naviguer dans l'environnement 3D
+          </p>
+          <div id="top-title" data-i18n-dynamic="true"></div>
+          <div id="bottom-title" data-i18n-dynamic="true"></div>
         </div>
         <button id="text-container" onclick="handleRedirect('1')">
           <h1 id="title"></h1>
@@ -75,6 +79,7 @@
         <div id="right-arrow-3" class="arrow">></div>
       </div>
     </div>
+    <script src="js/language-switcher.js"></script>
     <script src="js/divider-effect.js"></script>
     <script src="js/help-text.js"></script>
     <script src="module.js"></script>

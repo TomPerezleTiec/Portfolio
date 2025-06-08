@@ -369,7 +369,7 @@ body {
   position: absolute;
   width: 50%;
   text-align: center;
-  top: 10%; /* Descendu de 1% à 10% */
+  top: 5%; /* Ajusté pour correspondre à titles */
   pointer-events: none;
   font-family: "Arial", sans-serif;
 }
@@ -472,7 +472,7 @@ body {
   position: absolute;
   width: 50%;
   text-align: center;
-  top: 10%; /* Descendu de 1% à 10% */
+  top: 5%; /* Ajusté pour correspondre à titles */
   pointer-events: none;
   font-family: "Arial", sans-serif;
 }
@@ -537,4 +537,72 @@ body {
   margin-top: 10px;
   font-weight: bold;
   font-family: Arial, sans-serif;
+}
+
+#language-switcher {
+  position: fixed;
+  top: 15px; /* Position un peu plus basse */
+  right: 20px; /* Position à droite */
+  z-index: 9999; /* Z-index maximal pour être au-dessus de tout */
+  display: flex;
+  gap: 4px; /* Espace plus visible entre les boutons */
+  background-color: rgba(0, 0, 0, 0.7); /* Fond un peu moins transparent */
+  padding: 5px 8px; /* Padding légèrement augmenté */
+  border-radius: 15px; /* Bord plus arrondi */
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); /* Ombre plus visible */
+  border: 1px solid rgba(255, 255, 255, 0.4); /* Bordure plus visible */
+  transform: scale(1); /* Taille normale */
+  opacity: 0.95; /* Presque opaque */
+  transition: opacity 0.3s, transform 0.3s, box-shadow 0.3s; /* Transition douce */
+}
+
+#language-switcher:hover {
+  opacity: 1; /* Pleine opacité au survol */
+  transform: scale(1.05); /* Légèrement plus grand au survol */
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); /* Ombre plus visible au survol */
+}
+
+.lang-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #bbb;
+  font-size: 14px; /* Police agrandie */
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px 8px; /* Padding augmenté */
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  margin: 0; /* Pas d'espacement */
+  min-width: 30px; /* Largeur minimale augmentée */
+  text-align: center;
+  letter-spacing: 0; /* Lettres normalement espacées */
+  position: relative; /* Pour positionner l'indicateur */
+}
+
+.lang-btn:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.lang-btn.active {
+  color: #fff;
+  font-weight: bolder;
+  background-color: rgba(120, 220, 255, 0.4);
+  box-shadow: 0 0 10px rgba(120, 220, 255, 0.6); /* Ombre plus visible */
+  border-color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Ajoute un effet lumineux au texte */
+}
+
+/* Indicateur sous le bouton actif */
+.lang-btn.active:after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
 }
