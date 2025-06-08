@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (thirdPageVisible) {
         canvasInfo.textContent =
-          "Appuyez sur espace pour faire tomber une raquette de padel (maximum 5 raquettes)";
+          "Appuyez sur espace pour faire tomber une raquette de padel (maximum 5 balles)";
       } else if (secondPageVisible) {
         canvasInfo.textContent =
           "Vous pouvez jouer en mettant la souris dans l'environnement 3D et en faisant un clic gauche";

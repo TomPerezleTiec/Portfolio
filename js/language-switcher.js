@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
       helpTextSecondPage:
         "Vous pouvez jouer en mettant la souris dans l'environnement 3D et en faisant un clic gauche",
       helpTextThirdPage:
-        "Appuyez sur espace pour faire tomber une raquette de padel (maximum 5 raquettes)",
+        "Appuyez sur espace pour faire tomber une raquette de padel (maximum 5 balles)",
       limitReached: "Limite de 5 raquettes atteinte !",
 
       // Navigation
@@ -71,8 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
       helpTextFirstPage: "You can navigate in the 3D environment",
       helpTextSecondPage:
         "You can play by moving your mouse in the 3D environment and left clicking",
-      helpTextThirdPage:
-        "Press space to drop a padel racket (maximum 5 rackets)",
+      helpTextThirdPage: "Press space to drop a padel racket (maximum 5 balls)",
       limitReached: "Limit of 5 rackets reached!",
 
       // Navigation
@@ -197,8 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   // Mise à jour des titres de projet
   function updateProjectTitles(texts) {
-    console.log("Mise à jour des titres de projet en", currentLanguage);
-    // Titres d'année (2ème/3ème année)
+    console.log("Mise à jour des titres de projet en", currentLanguage); // Titres d'année (2ème/3ème année)
     document.querySelectorAll('[id^="top-title"]').forEach((element) => {
       console.log(
         "Élément trouvé:",
@@ -206,7 +204,17 @@ document.addEventListener("DOMContentLoaded", function () {
         "- Contenu actuel:",
         element.textContent
       );
+
+      // Traiter "Mes Projets" / "My Projects" séparément
       if (
+        element.textContent.includes("Mes Projets") ||
+        element.textContent.includes("My Projects")
+      ) {
+        element.textContent = texts.myProjects;
+        console.log("Modifié à:", texts.myProjects);
+      }
+      // Traiter les années (2ème/3ème année)
+      else if (
         element.textContent.includes("année") ||
         element.textContent.includes("year")
       ) {
@@ -216,12 +224,6 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (element.textContent.includes("3")) {
           element.textContent = texts.projectYear3;
           console.log("Modifié à:", texts.projectYear3);
-        } else if (
-          element.textContent.includes("Mes Projets") ||
-          element.textContent.includes("My Projects")
-        ) {
-          element.textContent = texts.myProjects;
-          console.log("Modifié à:", texts.myProjects);
         }
       }
     });
