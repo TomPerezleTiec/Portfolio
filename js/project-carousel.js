@@ -105,7 +105,6 @@ export function createModels({
       animate();
     }
   );
-
   function updateTextVisibility() {
     models.forEach((model) => {
       const depthFactor = (model.position.z + radius) / (2 * radius);
@@ -125,6 +124,18 @@ export function createModels({
       descriptionElement.innerText = projectData.description;
       topTitleElement.innerText = projectData.topTitle;
       bottomTitleElement.innerText = projectData.bottomTitle;
+
+      // Stocker le numéro de projet actif dans un attribut data- pour le language-switcher
+      container.dataset.activeProject = activeNumber;
+
+      // Déclencher un événement personnalisé pour signaler le changement de projet
+      const event = new CustomEvent("projectChanged", {
+        detail: {
+          containerId: containerId,
+          activeNumber: activeNumber,
+        },
+      });
+      document.dispatchEvent(event);
 
       const textContainer = titleElement.parentElement;
       textContainer.style.cursor = "pointer";
@@ -241,11 +252,12 @@ export const secondPageProjects = {
     link: "https://github.com/TomPerezleTiec/Advanced_Algorithm_Project",
   },
   2: {
-    title: "Pas encore réalisé",
-    description: "La description du projet n'a pas encore été réalisée.",
+    title: "Prédiction d'Attrition HumanForYou",
+    description:
+      "Projet d'intelligence artificielle développé pour prédire l'attrition des employés en utilisant plusieurs modèles de machine learning : Régression Logistique, Forêt Aléatoire, SVM et Réseaux de Neurones. Le projet analyse différents facteurs comme la satisfaction au travail, le salaire, les heures supplémentaires et les opportunités de formation pour identifier les employés susceptibles de quitter l'entreprise. Développé avec Python, scikit-learn et TensorFlow.",
     topTitle: "3ème année",
     bottomTitle: "IA - Python",
-    link: "",
+    link: "https://github.com/TomPerezleTiec/AI-ML-Bloc",
   },
   3: {
     title: "Pas encore réalisé",

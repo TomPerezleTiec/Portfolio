@@ -200,6 +200,18 @@ function createModels({
       topTitleElement.innerText = projectData.topTitle;
       bottomTitleElement.innerText = projectData.bottomTitle;
 
+      // Stocker le numéro de projet actif dans un attribut data- pour le language-switcher
+      container.dataset.activeProject = activeNumber;
+
+      // Déclencher un événement personnalisé pour signaler le changement de projet
+      const event = new CustomEvent("projectChanged", {
+        detail: {
+          containerId: containerId,
+          activeNumber: activeNumber,
+        },
+      });
+      document.dispatchEvent(event);
+
       const textContainer = titleElement.parentElement;
       textContainer.style.cursor = "pointer";
       textContainer.onclick = () => {
@@ -936,11 +948,12 @@ function transitionToSecondPage() {
           link: "https://github.com/TomPerezleTiec/Advanced_Algorithm_Project",
         },
         2: {
-          title: "Pas encore réalisé",
-          description: "La description du projet n'a pas encore été réalisée.",
+          title: "Prédiction d'Attrition",
+          description:
+            "Projet d'IA prédisant l'attrition des employés via des modèles ML (régression logistique, forêt aléatoire, SVM, réseaux de neurones). Analyse de facteurs RH (satisfaction, salaire, heures sup, formation). Réalisé en Python avec scikit-learn et TensorFlow.",
           topTitle: "3ème année",
           bottomTitle: "IA - Python",
-          link: "",
+          link: "https://github.com/TomPerezleTiec/AI-ML-Bloc",
         },
         3: {
           title: "Pas encore réalisé",

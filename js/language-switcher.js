@@ -1,7 +1,10 @@
 /**
  * Script pour gérer le changement de langue
  */
+console.log("=== DEBUT DU SCRIPT LANGUAGE-SWITCHER ===");
+
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("=== DOM CONTENT LOADED - LANGUAGE SWITCHER ===");
   // Langues disponibles
   const languages = {
     fr: {
@@ -49,12 +52,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       project1_3_title: "Dépistage",
       project1_3_desc:
-        "Le projet consiste à créer un site web centralisant les offres de stage et stockant les données des entreprises, pour faciliter la recherche de stages des étudiants via une plateforme dédiée. Il est important de noter que le projet était presque fini et qu'une erreur d'écrasement de la branche main à rendu beaucoup de page non aboutie et remplie d'erreurs fait en début de formation.",
-
-      // Projets Page 2
+        "Le projet consiste à créer un site web centralisant les offres de stage et stockant les données des entreprises, pour faciliter la recherche de stages des étudiants via une plateforme dédiée. Il est important de noter que le projet était presque fini et qu'une erreur d'écrasement de la branche main à rendu beaucoup de page non aboutie et remplie d'erreurs fait en début de formation.", // Projets Page 2
       project2_1_title: "VRTPW",
       project2_1_desc:
         "Le projet vise à planifier les itinéraires les plus courts pour livrer des clients à Barcelone dans des créneaux horaires précis, avec retour au dépôt. Des adresses et fenêtres de temps aléatoires ont été simulées, et l'ajout de plusieurs camions a été testé, bien que la solution reste non optimale par manque de temps.",
+
+      project2_2_title: "Prédiction d'Attrition",
+      project2_2_desc:
+        "Projet d'IA prédisant l'attrition des employés via des modèles ML (régression logistique, forêt aléatoire, SVM, réseaux de neurones). Analyse de facteurs RH (satisfaction, salaire, heures sup, formation). Réalisé en Python avec scikit-learn et TensorFlow.",
 
       // Projets Page 3
       project3_1_title: "Tournée de Tennis Live Tracker",
@@ -109,12 +114,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       project1_3_title: "Internship Finder",
       project1_3_desc:
-        "The project consists of creating a website centralizing internship offers and storing company data, to facilitate student internship searches via a dedicated platform. It is important to note that the project was almost finished and that a main branch overwrite error made many pages incomplete and filled with errors made at the beginning of training.",
-
-      // Projets Page 2
+        "The project consists of creating a website centralizing internship offers and storing company data, to facilitate student internship searches via a dedicated platform. It is important to note that the project was almost finished and that a main branch overwrite error made many pages incomplete and filled with errors made at the beginning of training.", // Projets Page 2
       project2_1_title: "VRTPW",
       project2_1_desc:
         "The project aims to plan the shortest routes to deliver to customers in Barcelona during precise time slots, with return to the depot. Random addresses and time windows were simulated, and the addition of several trucks was tested, although the solution remains non-optimal due to lack of time.",
+
+      project2_2_title: "Attrition Prediction",
+      project2_2_desc:
+        "AI project predicting employee attrition using ML models (logistic regression, random forest, SVM, neural networks). Analyzes HR factors (satisfaction, salary, overtime, training). Built with Python, scikit-learn, and TensorFlow.",
 
       // Projets Page 3
       project3_1_title: "Tennis Tour Live Tracker",
@@ -412,9 +419,20 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!container) return null;
 
     try {
-      // Trouver le modèle 3D actif (celui en avant)
+      // Utiliser l'attribut data-active-project si disponible
+      if (container.dataset.activeProject) {
+        console.log(
+          `Trouvé numéro actif dans dataset: ${container.dataset.activeProject}`
+        );
+        return container.dataset.activeProject;
+      }
+
+      // Sinon, essayer de trouver autrement (backup)
+      // Note: cette méthode ne fonctionne pas car THREE.Mesh n'est pas un sélecteur CSS valide
       const activeModel =
-        container.querySelector("THREE.Mesh")?.userData?.number;
+        container.querySelector("canvas")?.userData?.activeNumber;
+
+      console.log(`Retour du numéro de projet: ${activeModel || 1}`);
       return activeModel || 1; // Par défaut, retourner 1 si aucun modèle actif n'est trouvé
     } catch (error) {
       console.error(
@@ -491,14 +509,36 @@ document.addEventListener("DOMContentLoaded", function () {
   }); // Création de l'interface de sélection de langue
   function createLanguageSwitcher() {
     console.log("Création du sélecteur de langue");
+
+    // Vérifier si l'élément existe déjà pour éviter les doublons
+    const existingSwitcher = document.getElementById("language-switcher");
+    if (existingSwitcher) {
+      console.log("Sélecteur de langue déjà existant, suppression");
+      existingSwitcher.remove();
+    }
+
     const switcher = document.createElement("div");
-    switcher.id = "language-switcher"; // Utiliser les classes CSS au lieu des styles inline
+    switcher.id = "language-switcher";
+
+    // Styles inline temporaires pour forcer l'affichage
+    switcher.style.position = "fixed";
+    switcher.style.top = "15px";
+    switcher.style.right = "20px";
+    switcher.style.zIndex = "9999";
+    switcher.style.display = "flex";
+    switcher.style.gap = "4px";
+    switcher.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    switcher.style.padding = "8px 12px";
+    switcher.style.borderRadius = "15px";
+    switcher.style.border = "2px solid rgba(255, 255, 255, 0.6)";
+
     switcher.innerHTML = `
-      <button id="lang-fr" class="lang-btn active" title="Français">FR</button>
-      <button id="lang-en" class="lang-btn" title="English">EN</button>
+      <button id="lang-fr" class="lang-btn active" title="Français" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold;">FR</button>
+      <button id="lang-en" class="lang-btn" title="English" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #bbb; padding: 6px 12px; border-radius: 8px; cursor: pointer;">EN</button>
     `;
     document.body.appendChild(switcher);
-    console.log("Sélecteur de langue créé:", switcher);
+    console.log("Sélecteur de langue créé et ajouté au DOM:", switcher);
+    console.log("Body children après ajout:", document.body.children.length);
 
     // Ajout des événements sur les boutons
     document.getElementById("lang-fr").addEventListener("click", function () {
@@ -518,11 +558,27 @@ document.addEventListener("DOMContentLoaded", function () {
         changeLanguage("en");
       }
     });
-  }
-  // Initialisation
+  } // Initialisation
   function init() {
+    console.log("=== INITIALISATION DU LANGUAGE SWITCHER ===");
+
     // Création du sélecteur de langue
     createLanguageSwitcher();
+
+    // Vérification que l'élément a été créé
+    setTimeout(() => {
+      const switcher = document.getElementById("language-switcher");
+      if (switcher) {
+        console.log("✅ Sélecteur de langue trouvé dans le DOM après création");
+        console.log("Position:", switcher.style.position);
+        console.log("Display:", switcher.style.display);
+        console.log("Z-index:", switcher.style.zIndex);
+      } else {
+        console.error(
+          "❌ Sélecteur de langue NOT FOUND dans le DOM après création"
+        );
+      }
+    }, 100);
 
     // Récupération de la langue préférée si stockée
     const savedLanguage = localStorage.getItem("preferredLanguage");
@@ -719,4 +775,54 @@ document.addEventListener("DOMContentLoaded", function () {
       e
     );
   }
+  // Écouter les changements de projet dans les carrousels
+  document.addEventListener("projectChanged", function (e) {
+    console.log("Événement projectChanged reçu:", e.detail);
+    const { containerId, activeNumber } = e.detail;
+
+    // Retarder légèrement pour s'assurer que le DOM est mis à jour
+    setTimeout(() => {
+      // Forcer la mise à jour de la traduction pour le titre et la description correspondants
+      let titleId, descriptionId;
+
+      if (containerId === "number-3d-container") {
+        titleId = "title";
+        descriptionId = "description";
+      } else if (containerId === "number-3d-container-2") {
+        titleId = "title-2";
+        descriptionId = "description-2";
+      } else if (containerId === "number-3d-container-3") {
+        titleId = "title-3";
+        descriptionId = "description-3";
+      }
+
+      if (titleId && descriptionId) {
+        const titleElement = document.getElementById(titleId);
+        const descriptionElement = document.getElementById(descriptionId);
+
+        if (titleElement && descriptionElement) {
+          const pageNum =
+            titleId === "title" ? 1 : titleId === "title-2" ? 2 : 3;
+          const translationKeyTitle = `project${pageNum}_${activeNumber}_title`;
+          const translationKeyDesc = `project${pageNum}_${activeNumber}_desc`;
+
+          console.log(
+            `Mise à jour des traductions: ${translationKeyTitle}, ${translationKeyDesc}`
+          );
+
+          const texts = languages[currentLanguage];
+
+          if (texts[translationKeyTitle]) {
+            titleElement.textContent = texts[translationKeyTitle];
+          }
+
+          if (texts[translationKeyDesc]) {
+            descriptionElement.textContent = texts[translationKeyDesc];
+          }
+        }
+      }
+    }, 50);
+  });
+
+  console.log("=== FIN DU SCRIPT LANGUAGE-SWITCHER ===");
 });
