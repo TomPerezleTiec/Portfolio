@@ -55,11 +55,13 @@ document.addEventListener("DOMContentLoaded", function () {
         "Le projet consiste à créer un site web centralisant les offres de stage et stockant les données des entreprises, pour faciliter la recherche de stages des étudiants via une plateforme dédiée. Il est important de noter que le projet était presque fini et qu'une erreur d'écrasement de la branche main à rendu beaucoup de page non aboutie et remplie d'erreurs fait en début de formation.", // Projets Page 2
       project2_1_title: "VRTPW",
       project2_1_desc:
-        "Le projet vise à planifier les itinéraires les plus courts pour livrer des clients à Barcelone dans des créneaux horaires précis, avec retour au dépôt. Des adresses et fenêtres de temps aléatoires ont été simulées, et l'ajout de plusieurs camions a été testé, bien que la solution reste non optimale par manque de temps.",
-
-      project2_2_title: "Prédiction d'Attrition",
+        "Le projet vise à planifier les itinéraires les plus courts pour livrer des clients à Barcelone dans des créneaux horaires précis, avec retour au dépôt. Des adresses et fenêtres de temps aléatoires ont été simulées, et l'ajout de plusieurs camions a été testé, bien que la solution reste non optimale par manque de temps.",      project2_2_title: "Prédiction d'Attrition",
       project2_2_desc:
         "Projet d'IA prédisant l'attrition des employés via des modèles ML (régression logistique, forêt aléatoire, SVM, réseaux de neurones). Analyse de facteurs RH (satisfaction, salaire, heures sup, formation). Réalisé en Python avec scikit-learn et TensorFlow.",
+
+      project2_3_title: "EasySave",
+      project2_3_desc:
+        "EasySave est un logiciel de sauvegarde développé en plusieurs versions dans le cadre d'un projet d'ingénierie. L'objectif est de livrer une application robuste, multiplateforme et interactive qui intègre des fonctionnalités avancées pour la gestion des sauvegardes, la sécurité et l'optimisation réseau. Nous sommes engagés par Prosoft pour ce projet.",
 
       // Projets Page 3
       project3_1_title: "Tournée de Tennis Live Tracker",
@@ -117,11 +119,13 @@ document.addEventListener("DOMContentLoaded", function () {
         "The project consists of creating a website centralizing internship offers and storing company data, to facilitate student internship searches via a dedicated platform. It is important to note that the project was almost finished and that a main branch overwrite error made many pages incomplete and filled with errors made at the beginning of training.", // Projets Page 2
       project2_1_title: "VRTPW",
       project2_1_desc:
-        "The project aims to plan the shortest routes to deliver to customers in Barcelona during precise time slots, with return to the depot. Random addresses and time windows were simulated, and the addition of several trucks was tested, although the solution remains non-optimal due to lack of time.",
-
-      project2_2_title: "Attrition Prediction",
+        "The project aims to plan the shortest routes to deliver to customers in Barcelona during precise time slots, with return to the depot. Random addresses and time windows were simulated, and the addition of several trucks was tested, although the solution remains non-optimal due to lack of time.",      project2_2_title: "Attrition Prediction",
       project2_2_desc:
         "AI project predicting employee attrition using ML models (logistic regression, random forest, SVM, neural networks). Analyzes HR factors (satisfaction, salary, overtime, training). Built with Python, scikit-learn, and TensorFlow.",
+
+      project2_3_title: "EasySave",
+      project2_3_desc:
+        "EasySave is a backup software developed across multiple versions as part of an engineering project. The goal is to deliver a robust, cross-platform, and interactive application that integrates advanced features for backup management, security, and network optimization. We are engaged by Prosoft for this project.",
 
       // Projets Page 3
       project3_1_title: "Tennis Tour Live Tracker",
