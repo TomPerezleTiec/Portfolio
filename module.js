@@ -954,9 +954,11 @@ function transitionToSecondPage() {
           topTitle: "3ème année",
           bottomTitle: "IA - Python",
           link: "https://github.com/TomPerezleTiec/AI-ML-Bloc",
-        },        3: {
+        },
+        3: {
           title: "EasySave",
-          description: "EasySave est un logiciel de sauvegarde développé en plusieurs versions dans le cadre d'un projet d'ingénierie. L'objectif est de livrer une application robuste, multiplateforme et interactive qui intègre des fonctionnalités avancées pour la gestion des sauvegardes, la sécurité et l'optimisation réseau. Nous sommes engagés par Prosoft pour ce projet.",
+          description:
+            "EasySave est un logiciel de sauvegarde développé en plusieurs versions dans le cadre d'un projet d'ingénierie. L'objectif est de livrer une application robuste, multiplateforme et interactive qui intègre des fonctionnalités avancées pour la gestion des sauvegardes, la sécurité et l'optimisation réseau. Nous sommes engagés par Prosoft pour ce projet.",
           topTitle: "3ème année",
           bottomTitle: "Génie Logiciel",
           link: "https://github.com/Mohamed-Gueye/Easy_save_orig",
