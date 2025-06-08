@@ -1098,15 +1098,14 @@ function transitionToThirdPage(padelRacket, padelCourt) {
     });
     thirdPageInitialized = true;
   }
-
   if (isScrolling || !padelModelsLoaded) return;
   isScrolling = true;
 
   gsap.to(tennisBallModel.scale, {
     duration: 1,
-    x: 32,
-    y: 33,
-    z: 32,
+    x: 10,
+    y: 10,
+    z: 10,
     ease: "power2.inOut",
     onComplete: function () {
       terrainModel.visible = false;
