@@ -1,0 +1,608 @@
+body {
+  margin: 0;
+  display: flex;
+  background-color: #000000;
+}
+
+#canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100vh;
+}
+
+#help-text {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 15px;
+  border-radius: 8px;
+  z-index: 100;
+  pointer-events: none;
+  max-width: 250px; /* Limite la largeur pour forcer le retour à la ligne */
+}
+
+#canvas-info {
+  color: white;
+  margin: 0;
+  font-size: 1rem;
+  font-family: "Arial", sans-serif;
+  text-align: left; /* Alignement à gauche pour une meilleure lisibilité du texte multi-lignes */
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: normal; /* Permet le retour à la ligne */
+  word-wrap: break-word; /* Pour les mots très longs */
+  line-height: 1.4; /* Améliore l'espacement des lignes */
+}
+
+#screen-divider {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 0px; /* Changed from 1px to eliminate visible line */
+  height: 100vh;
+  background: transparent;
+  box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.4),
+    0 0 60px 30px rgba(120, 220, 255, 0.3);
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: dividerGlow 5s infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes dividerGlow {
+  0% {
+    box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.3),
+      0 0 60px 30px rgba(120, 220, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 35px 20px rgba(255, 255, 255, 0.5),
+      0 0 80px 40px rgba(120, 220, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.3),
+      0 0 60px 30px rgba(120, 220, 255, 0.2);
+  }
+}
+
+.divider-particle {
+  position: absolute;
+  background-color: rgba(204, 236, 31, 0.95); /* Tennis ball green-yellow */
+  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  box-shadow: 0 0 5px 2px rgba(180, 210, 20, 0.5);
+  animation: particleFloat 10s infinite;
+  opacity: 0;
+  /* Position will be set by JS */
+  pointer-events: none;
+  /* Tennis ball fuzz texture */
+  background-image: radial-gradient(
+    ellipse at center,
+    rgba(204, 236, 31, 0.95) 40%,
+    rgba(194, 226, 21, 0.9) 60%,
+    rgba(184, 216, 11, 0.85) 80%
+  );
+}
+
+@keyframes particleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  10% {
+    opacity: 0.95;
+  }
+  97% {
+    transform: translateY(-97vh) rotate(680deg);
+  }
+  99% {
+    opacity: 0.95;
+    transform: translateY(-99.5vh) rotate(710deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100vh) rotate(720deg);
+  }
+}
+
+.content {
+  color: white;
+}
+
+.content-section {
+  padding: 50px;
+  border-bottom: 1px solid #ddd;
+}
+
+#second-page,
+#third-page {
+  display: none;
+}
+
+#bottom-portal {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 102%;
+  height: 15px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8),
+    rgba(0, 0, 255, 0.6)
+  );
+  box-shadow: 0 0 20px 10px rgba(0, 0, 255, 0.5);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 100;
+  pointer-events: none;
+}
+
+@keyframes portalGlow {
+  0% {
+    box-shadow: 0 0 20px 5px rgba(0, 0, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px 15px rgba(0, 0, 255, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 20px 5px rgba(0, 0, 255, 0.5);
+  }
+}
+
+#bottom-portal.active {
+  opacity: 1;
+  animation: portalGlow 1.5s infinite;
+}
+
+#score-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  font-size: 24px;
+  color: #fff;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  font-family: "Arial", sans-serif;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+#score-container .highlight {
+  color: #ffeb3b;
+  font-weight: bold;
+}
+
+#score-container .label {
+  color: #ccc;
+  font-weight: normal;
+}
+
+#number-3d-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 10%;
+  cursor: pointer;
+  z-index: 10;
+  font-weight: 900;
+  font-size: xxxx-large;
+}
+
+#left-arrow {
+  left: 63%;
+}
+
+#right-arrow {
+  right: 12%;
+}
+
+#text-container {
+  position: absolute;
+  top: 72%;
+  left: 75.5%;
+  transform: translate(-50%, 0%);
+  text-align: center;
+  background-color: #282c34;
+  border: 5px solid #ffffff; /* Bordure plus épaisse et vraiment blanche */
+  outline: 2px solid #ffffff; /* Outline supplémentaire pour plus d'impact */
+  outline-offset: 3px; /* Espace entre la bordure et l'outline */
+  border-radius: 10px;
+  padding: 15px 20px 0px 20px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0px 0px 20px 10px rgba(255, 255, 255, 0.9); /* Lueur blanche intense */
+  width: 40%;
+}
+
+#text-container:hover {
+  transform: translate(-50%, -10%) scale(1.05);
+  box-shadow: 0px 8px 25px rgba(255, 255, 255, 0.9),
+    0px 0px 50px rgba(255, 255, 255, 0.7); /* Lueur plus intense au survol sans changer la bordure */
+}
+
+#title {
+  font-size: 2.8em;
+  color: white;
+  margin: 0;
+}
+
+#description {
+  font-size: 1.4em;
+  color: lightgray;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+#titles {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  text-align: center;
+  top: 5%; /* Descendu de 1% à 10% */
+  pointer-events: none;
+  font-family: "Arial", sans-serif;
+}
+
+#titles p#info,
+#titles-2 p#info,
+#titles-3 p#info {
+  display: none; /* Masquer les infos originales car elles sont maintenant dans #canvas-info */
+}
+
+#top-title {
+  margin-top: 20%;
+  font-size: 4em;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  letter-spacing: 1px;
+}
+
+#bottom-title {
+  font-size: 2em;
+  font-weight: 300;
+  color: #b0b0b0;
+  margin: 10px 0 0 0;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  font-style: italic;
+}
+
+#number-3d-container-2 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#left-arrow-2,
+#right-arrow-2 {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 10%;
+  cursor: pointer;
+  z-index: 10;
+  font-weight: 900;
+  font-size: xxxx-large;
+}
+
+#left-arrow-2 {
+  left: 63%;
+}
+
+#right-arrow-2 {
+  right: 12%;
+}
+
+#text-container-2 {
+  position: absolute;
+  top: 72%;
+  left: 75.5%;
+  transform: translate(-50%, 0%);
+  text-align: center;
+  background-color: #282c34;
+  border: 5px solid #ffffff; /* Bordure plus épaisse et vraiment blanche */
+  outline: 2px solid #ffffff; /* Outline supplémentaire pour plus d'impact */
+  outline-offset: 3px; /* Espace entre la bordure et l'outline */
+  border-radius: 10px;
+  padding: 15px 20px 0px 20px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0px 0px 20px 10px rgba(255, 255, 255, 0.9); /* Lueur blanche intense */
+  width: 40%;
+}
+
+#text-container-2:hover {
+  transform: translate(-50%, -10%) scale(1.05);
+  box-shadow: 0px 8px 25px rgba(255, 255, 255, 0.9),
+    0px 0px 50px rgba(255, 255, 255, 0.7); /* Lueur plus intense au survol sans changer la bordure */
+}
+
+#title-2 {
+  font-size: 2.5em;
+  color: white;
+  margin: 0;
+  font-family: "Arial", sans-serif;
+}
+
+#description-2 {
+  font-size: 1.2em;
+  color: lightgray;
+  margin-top: 10px;
+  line-height: 1.5;
+  font-family: "Arial", sans-serif;
+}
+
+#titles-2 {
+  left: 50%;
+  position: absolute;
+  width: 50%;
+  text-align: center;
+  top: 5%; /* Ajusté pour correspondre à titles */
+  pointer-events: none;
+  font-family: "Arial", sans-serif;
+}
+
+#top-title-2 {
+  font-size: 4em;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  letter-spacing: 1px;
+}
+
+#bottom-title-2 {
+  font-size: 2em;
+  font-weight: 300;
+  color: #b0b0b0;
+  margin: 10px 0 0 0;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  font-style: italic;
+}
+
+#number-3d-container-3 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#left-arrow-3,
+#right-arrow-3 {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 10%;
+  cursor: pointer;
+  z-index: 10;
+  font-weight: 900;
+  font-size: xxxx-large;
+}
+
+#left-arrow-3 {
+  left: 63%;
+}
+
+#right-arrow-3 {
+  right: 12%;
+}
+
+#text-container-3 {
+  position: absolute;
+  top: 72%;
+  left: 75.5%;
+  transform: translate(-50%, 0%);
+  text-align: center;
+  background-color: #282c34;
+  border: 5px solid #ffffff; /* Bordure plus épaisse et vraiment blanche */
+  outline: 2px solid #ffffff; /* Outline supplémentaire pour plus d'impact */
+  outline-offset: 3px; /* Espace entre la bordure et l'outline */
+  border-radius: 10px;
+  padding: 15px 20px 0px 20px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0px 0px 20px 10px rgba(255, 255, 255, 0.9); /* Lueur blanche intense */
+  width: 40%;
+}
+
+#text-container-3:hover {
+  transform: translate(-50%, -10%) scale(1.05);
+  box-shadow: 0px 8px 25px rgba(255, 255, 255, 0.9),
+    0px 0px 50px rgba(255, 255, 255, 0.7); /* Lueur plus intense au survol sans changer la bordure */
+}
+
+#title-3 {
+  font-size: 2.5em;
+  color: white;
+  margin: 0;
+  font-family: "Arial", sans-serif;
+}
+
+#description-3 {
+  font-size: 1.2em;
+  color: lightgray;
+  margin-top: 10px;
+  line-height: 1.5;
+  font-family: "Arial", sans-serif;
+}
+
+#titles-3 {
+  left: 50%;
+  position: absolute;
+  width: 50%;
+  text-align: center;
+  top: 5%; /* Ajusté pour correspondre à titles */
+  pointer-events: none;
+  font-family: "Arial", sans-serif;
+}
+
+#top-title-3 {
+  font-size: 4em;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  letter-spacing: 1px;
+}
+
+#bottom-title-3 {
+  font-size: 2em;
+  font-weight: 300;
+  color: #b0b0b0;
+  margin: 10px 0 0 0;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  font-style: italic;
+}
+
+#loading-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#loading-ball {
+  width: 35px;
+  height: 35px;
+  margin-left: 30%;
+  background-color: yellow;
+  border-radius: 50%;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: bounce 1s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-25px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+#loading-text {
+  font-size: 1.5rem;
+  color: white;
+  margin-top: 10px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+}
+
+#language-switcher {
+  position: fixed;
+  top: 15px; /* Position un peu plus basse */
+  right: 20px; /* Position à droite */
+  z-index: 9999; /* Z-index maximal pour être au-dessus de tout */
+  display: flex;
+  gap: 4px; /* Espace plus visible entre les boutons */
+  background-color: rgba(0, 0, 0, 0.7); /* Fond un peu moins transparent */
+  padding: 5px 8px; /* Padding légèrement augmenté */
+  border-radius: 15px; /* Bord plus arrondi */
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); /* Ombre plus visible */
+  border: 1px solid rgba(255, 255, 255, 0.4); /* Bordure plus visible */
+  transform: scale(1); /* Taille normale */
+  opacity: 0.95; /* Presque opaque */
+  transition: opacity 0.3s, transform 0.3s, box-shadow 0.3s; /* Transition douce */
+}
+
+#language-switcher:hover {
+  opacity: 1; /* Pleine opacité au survol */
+  transform: scale(1.05); /* Légèrement plus grand au survol */
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); /* Ombre plus visible au survol */
+}
+
+.lang-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #bbb;
+  font-size: 14px; /* Police agrandie */
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px 8px; /* Padding augmenté */
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  margin: 0; /* Pas d'espacement */
+  min-width: 30px; /* Largeur minimale augmentée */
+  text-align: center;
+  letter-spacing: 0; /* Lettres normalement espacées */
+  position: relative; /* Pour positionner l'indicateur */
+}
+
+.lang-btn:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.lang-btn.active {
+  color: #fff;
+  font-weight: bolder;
+  background-color: rgba(120, 220, 255, 0.4);
+  box-shadow: 0 0 10px rgba(120, 220, 255, 0.6); /* Ombre plus visible */
+  border-color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Ajoute un effet lumineux au texte */
+}
+
+/* Indicateur sous le bouton actif */
+.lang-btn.active:after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
